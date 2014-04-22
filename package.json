@@ -1,0 +1,16 @@
+{
+  "name": "blog-backend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.4.8",
+  },
+  "description": "The backend of my personal blog.",
+  "main": "app.js",
+  "devDependencies": {},
+  "author": "Sirius",
+  "license": "MIC"
+}
