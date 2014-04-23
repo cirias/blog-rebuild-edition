@@ -7,10 +7,22 @@
   },
   "dependencies": {
     "express": "3.4.8",
+    "async": "^0.7.0",
+    "log4js": "^0.6.14",
+    "marked": "^0.3.2",
+    "mongoose": "^3.8.8"
   },
   "description": "The backend of my personal blog.",
   "main": "app.js",
   "devDependencies": {},
   "author": "Sirius",
-  "license": "MIC"
+  "license": "MIC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fhc023/blog-backend"
+  },
+  "bugs": {
+    "url": "https://github.com/fhc023/blog-backend/issues"
+  },
+  "homepage": "https://github.com/fhc023/blog-backend"
 }
