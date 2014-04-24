@@ -12,7 +12,7 @@ exports.getArticleInfos = function(req, res) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {
-			res.send(results);
+			res.send(Article.aftertreat(results));
 		}
 	});
 }

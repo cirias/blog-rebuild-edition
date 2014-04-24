@@ -2,6 +2,7 @@
 var mongodb = require('./mongodb');
 var marked = require('marked');
 var message = require('../config.js').message;
+var utils = require('../utils.js');
 
 var Schema = mongodb.mongoose.Schema;
 var ArticleSchema = new Schema(
@@ -11,7 +12,7 @@ var ArticleSchema = new Schema(
         tags :              {type: [String], default: ['default']},
         createDate :        {type: Date, default: Date.now},
         modifyDate :        {type: Date, default: Date.now},
-        hidden :            Boolean,
+        hidden :            {type: Boolean, default: true},
         mdContent :         String,
         htmlcontent :       String,
         hits :              {type: Number, default: 0},
@@ -19,6 +20,7 @@ var ArticleSchema = new Schema(
         metaDescription :   String
     }
 );
+var Keys = ['title', 'alias', 'tags', 'createDate', 'modifyDate', 'hidden', 'mdContent', 'htmlcontent', 'hits', 'metaKeywords', 'metaDescription'];
 var Article = mongodb.mongoose.model("Article", ArticleSchema);
 var ArticleDAO = function(){};
 module.exports = new ArticleDAO();
@@ -61,25 +63,50 @@ ArticleDAO.prototype.delete = function(id, callback) {
 
 //预处理文章
 ArticleDAO.prototype.pretreat = function(article, callback) {
-    article.htmlcontent = marked(article.mdContent);
+    if (article.mdContent) article.htmlcontent = marked(article.mdContent);
 
     return article;
+}
+
+//后处理文章
+ArticleDAO.prototype.aftertreat = function(articles, callback) {
+    var treatdata = function(article) {
+        var treadedArticle = {};
+        for (key in article) {
+            if (Keys.indexOf(key) == -1) continue;
+            if (key == 'createDate' && article.createDate) {treadedArticle.createDate = article.createDate.format('yyyy-MM-dd'); continue;}
+            if (key == 'modifyDate' && article.modifyDate) {treadedArticle.modifyDate = article.modifyDate.format('yyyy-MM-dd'); continue;}
+
+            treadedArticle[key] = article[key];
+        }
+        return treadedArticle;
+    }
+
+    if (Array.isArray(articles)) {
+        var treadedArticles = [];
+        articles.forEach(function(article) {
+            treadedArticles.push(treatdata(article));
+        });
+        
+        return treadedArticles;
+    } else {
+        return treatdata(articles);
+    }
 }
 
 //验证文章
 ArticleDAO.prototype.verify = function(article, callback) {
     var verifyMsg = [];
 
-    if (!article.title && typeof article.title !== 'undefined') verifyMsg.push(message.MISSING_BODY);
-    if (!article.alias && typeof article.alias !== 'undefined') verifyMsg.push(message.MISSING_BODY);
-    if (!article.tags && typeof article.tags !== 'undefined') verifyMsg.push(message.MISSING_BODY);
-    if (!article.createDate && typeof article.createDate !== 'undefined') verifyMsg.push(message.MISSING_BODY);
-    if (!article.modifyDate && typeof article.modifyDate !== 'undefined') verifyMsg.push(message.MISSING_BODY);
-    if (!article.hidden && typeof article.hidden !== 'undefined') verifyMsg.push(message.MISSING_BODY);
-    if (!article.mdContent && typeof article.mdContent !== 'undefined') verifyMsg.push(message.MISSING_BODY);
-    if (!article.htmlcontent && typeof article.htmlcontent !== 'undefined') verifyMsg.push(message.MISSING_BODY);
-    if (!article.metaKeywords && typeof article.metaKeywords !== 'undefined') verifyMsg.push(message.MISSING_BODY);
-    if (!article.metaDescription && typeof article.metaDescription !== 'undefined') verifyMsg.push(message.MISSING_BODY);
+    if (!article.title) verifyMsg.push(message.MISSING_TITLE);
+    if (!article.alias) verifyMsg.push(message.MISSING_ALIAS);
+    // if (!article.tags) verifyMsg.push(message.MISSING_TAGS);
+    if (!article.createDate) verifyMsg.push(message.MISSING_CDATE);
+    if (!article.modifyDate) verifyMsg.push(message.MISSING_MDATE);
+    if (!article.mdContent) verifyMsg.push(message.MISSING_MCONTENT);
+    if (!article.htmlcontent && typeof article.htmlcontent !== 'undefined') verifyMsg.push(message.MISSING_HCONTENT);
+    if (!article.metaKeywords) verifyMsg.push(message.MISSING_MKEYWORDS);
+    if (!article.metaDescription) verifyMsg.push(message.MISSING_MDESCRIPTION);
 
     return verifyMsg;
 }
