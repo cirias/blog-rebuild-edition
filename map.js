@@ -16,7 +16,7 @@ module.exports = function(app) {
 
 	app.get('/tags', common.getTags);
 
-	app.post('/article/:id', admin.postArticle);
-
 	app.post('/article', admin.postArticle);
+
+	app.get('/article', common.getArticle);
 }
