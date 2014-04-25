@@ -12,7 +12,9 @@ module.exports = function(app) {
 	    next();
 	});
 
-	app.get('/articleInfos', admin.getArticleInfos);
+	app.get('/articles', admin.getArticleInfos);
+	app.put('/articles', admin.updateArticles);
+	app.del('/articles', admin.removeArticles);
 
 	app.get('/tags', common.getTags);
 

@@ -49,6 +49,11 @@ ArticleDAO.prototype.insert = function(article, callback) {
 
 //更新文章
 ArticleDAO.prototype.update = function(article, callback) {
+    if (!article._id) {
+        callback(message.MISSING_ID);
+        return;
+    }
+    
     var _id = article._id;
     delete article._id;
     Article.findByIdAndUpdate(_id, article, {}, function(err) {

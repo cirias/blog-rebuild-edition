@@ -17,6 +17,36 @@ exports.getArticleInfos = function(req, res) {
 	});
 }
 
+//批量更新
+exports.updateArticles = function(req, res) {
+	async.each(req.body.articles, function(article, callback) {
+		Article.update(article, function(err) {
+			callback(err);
+		});
+	}, function(err) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send({success: true, msg: message.UPDATE_SUCCESS});
+		}
+	});
+}
+
+//批量删除
+exports.removeArticles = function(req, res) {
+	async.each(req.query.articleIds, function(id, callback) {
+		Article.remove(id, function(err) {
+			callback(err);
+		});
+	}, function(err) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send({success: true, msg: message.REMOVE_SUCCESS});
+		}
+	});
+}
+
 //提交文章
 exports.postArticle = function(req, res) {
 	var article = Article.pretreat(req.body);
