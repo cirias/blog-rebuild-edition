@@ -19,16 +19,15 @@ exports.getArticleInfos = function(req, res) {
 
 //提交文章
 exports.postArticle = function(req, res) {
-	var verifyMsg = Article.verify(req.body);
-
-	if (verifyMsg.length != 0) {
-		res.send({success: false, msg: verifyMsg});
-		return;
-	}
-
 	var article = Article.pretreat(req.body);
 
 	if (!article._id) {
+		var verifyMsg = Article.verify(req.body);
+		if (verifyMsg.length != 0) {
+			res.send({success: false, msg: verifyMsg});
+			return;
+		}
+
 		Article.insert(article, function(err) {
 			if (err) {
 				res.send({success: false, msg: err});
@@ -41,8 +40,24 @@ exports.postArticle = function(req, res) {
 			if (err) {
 				res.send({success: false, msg: err});
 			} else {
-				res.send({success: true, msg: message.INSERT_SUCCESS});
+				res.send({success: true, msg: message.UPDATE_SUCCESS});
 			}
 		})
 	}
+}
+
+//删除文章
+exports.removeArticle = function(req, res) {
+	if (!req.query.id) {
+		res.send({success: false, msg: message.MISSING_ID});
+		return;
+	}
+
+	Article.remove(req.query.id, function(err) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send({success: true, msg: message.REMOVE_SUCCESS});
+		}
+	});
 }

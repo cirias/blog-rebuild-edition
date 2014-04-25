@@ -57,7 +57,7 @@ ArticleDAO.prototype.update = function(article, callback) {
 }
 
 //删除文章
-ArticleDAO.prototype.delete = function(id, callback) {
+ArticleDAO.prototype.remove = function(id, callback) {
     Article.remove({_id: id}, function(err){
         callback(err);
     });

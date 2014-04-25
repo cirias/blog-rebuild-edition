@@ -5,11 +5,15 @@ exports.config = {
 	PUBLIC_KEY  : '6Lc7LPESAAAAAAII8Q419IuYbiVLWChDdgF09eWh',
     PRIVATE_KEY : '6Lc7LPESAAAAAFXQemWzWmyTkuQo56WFIMowANq3',
     DB_CONNECTION : 'mongodb://localhost/blog',
-    ARTICLE_INFO_FIELDS : 'title createDate hidden hits alias'
+    ARTICLE_INFO_FIELDS : 'title createDate hidden hits alias tags'
 };//
 
 exports.message = {
 	INSERT_SUCCESS:	'New Article Success.',
+	UPDATE_SUCCESS: 'Update Article Success.', 
+	REMOVE_SUCCESS:	'Remove Article Success.',
+
+	MISSING_ID:		'Missing ArticleId.',
 	MISSING_TITLE:	'Please input a title.',
 	MISSING_ALIAS:	'Please input an alias.',
 	MISSING_TAGS:	'Please choose some tags.',
