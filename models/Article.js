@@ -20,7 +20,7 @@ var ArticleSchema = new Schema(
         metaDescription :   String
     }
 );
-var Keys = ['title', 'alias', 'tags', 'createDate', 'modifyDate', 'hidden', 'mdContent', 'htmlcontent', 'hits', 'metaKeywords', 'metaDescription'];
+
 var Article = mongodb.mongoose.model("Article", ArticleSchema);
 var ArticleDAO = function(){};
 module.exports = new ArticleDAO();
@@ -49,7 +49,9 @@ ArticleDAO.prototype.insert = function(article, callback) {
 
 //更新文章
 ArticleDAO.prototype.update = function(article, callback) {
-    Article.findByIdAndUpdate(article._id, article, {}, function(err) {
+    var _id = article._id;
+    delete article._id;
+    Article.findByIdAndUpdate(_id, article, {}, function(err) {
         callback(err);
     });
 }
@@ -72,6 +74,11 @@ ArticleDAO.prototype.pretreat = function(article, callback) {
 ArticleDAO.prototype.aftertreat = function(articles, callback) {
     var treatdata = function(article) {
         var treadedArticle = {};
+        var Keys = [];
+        Article.schema.eachPath(function(key) {
+            Keys.push(key);
+        });
+
         for (key in article) {
             if (Keys.indexOf(key) == -1) continue;
             if (key == 'createDate' && article.createDate) {treadedArticle.createDate = article.createDate.format('yyyy-MM-dd'); continue;}

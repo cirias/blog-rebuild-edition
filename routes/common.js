@@ -18,7 +18,7 @@ exports.getArticle = function(req, res) {
 			if (err) {
 				res.send({success: false, msg: err});
 			} else {
-				res.send(article);
+				res.send(Article.aftertreat(article));
 			}
 		});
 	}
