@@ -1,8 +1,11 @@
 var async = require('async');
+var multiparty = require('multiparty');
 // var Recaptcha = require('recaptcha').Recaptcha;
 var Article = require('./../models/Article.js');
+var Picture = require('./../models/Picture.js');
 var message = require('../config.js').message;
 var config = require('../config.js').config;
+var utils = require('../utils.js');
 // var Tag = require('./../models/Tag.js');
 // var User = require('./../models/User.js');
 
@@ -89,5 +92,37 @@ exports.removeArticle = function(req, res) {
 		} else {
 			res.send({success: true, msg: message.REMOVE_SUCCESS});
 		}
+	});
+}
+
+exports.saveImage = function (req, res) {
+	var form = new multiparty.Form(config.MULTIPARTY_OPTIONS);
+
+	form.parse(req, function(err, fields, files){
+		if (err) {
+			res.send({success: false, msg: err});
+		}
+		
+		var file = {};
+		file.name = files.file[0].originalFilename;
+		file.type = files.file[0].headers['content-type'] || null;
+		file.path = files.file[0].path;
+		file.size = files.file[0].size;
+
+		var verifyMsg = Picture.verify(file);
+		if (verifyMsg.length != 0) {
+			res.send({success: false, msg: verifyMsg});
+			return;
+		}
+
+		Picture.save(file, function(err, data) {
+			if (err) {
+				res.send({success: false, msg: err});
+			} else {
+				res.send({success: true, msg: message.UPLOAD_IMAGE_SUCCESS, image: data});
+			}
+
+			utils.deleteContentsInDir(config.MULTIPARTY_OPTIONS.uploadDir);
+		});
 	});
 }

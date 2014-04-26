@@ -1,4 +1,6 @@
 logs/*
+temp/*
+public/images/*
 !.gitkeep
 node_modules/
 bower_components/

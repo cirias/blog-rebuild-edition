@@ -77,7 +77,7 @@ ArticleDAO.prototype.pretreat = function(article, callback) {
 
 //后处理文章
 ArticleDAO.prototype.aftertreat = function(articles, callback) {
-    var treatdata = function(article) {
+    function treatdata(article) {
         var treadedArticle = {};
         var Keys = [];
         Article.schema.eachPath(function(key) {

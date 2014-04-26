@@ -20,9 +20,10 @@ app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
+// app.use(express.multipart());
 app.use(express.methodOverride());
 app.use(app.router);
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, config.STATIC_DIR)));
 // app.use(utils.sanitize(req.body));
 // app.use(utils.sanitize(req.params));
 
