@@ -4,17 +4,28 @@ var Schema = mongodb.mongoose.Schema;
 
 var TagSchema = new Schema(
     {
-        name : String,
-        hidden : {type: Boolean, default: 'TRUE'}
+        name : {type: String, required: true, unique: true},
+        hidden : {type: Boolean, default: true}
     }
 );
 
-var Tag = mongodb.mongoose.model('Tag', TagSchema);
-var TagDAO = function(){};
-module.exports = new TagDAO();
+TagSchema.static('selectAll', function(callback){
+	this.find({}).exec(callback);
+});
 
-TagDAO.prototype.SelectAll = function(callback){
-	Tag.find({}).exec(function(err, tags){
-		callback(err, tags);
+TagSchema.static('saveNews', function(newTags, callback){
+	this.find({}).exec(function(err, tags) {
+		if (err) return callback(err);
+
+		async.each(newTags.filter(function(newTag) {
+			return tags.map(function(tag) {
+					return tag.name;
+				}).indexOf(newTag) < 0;
+		}), function(newTag, callback) {
+			new Tag({ name: newTag }).save(callback);
+		}, callback);
 	});
-}
+});
+
+var Tag = mongodb.mongoose.model('Tag', TagSchema);
+module.exports = Tag;

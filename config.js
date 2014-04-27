@@ -37,6 +37,7 @@ exports.message = {
 	MISSING_MKEYWORDS:	'Please input meta keywords.',
 	MISSING_MDESCRIPTION:	'Please meta description.',
 	MISSING_BODY:	'One or more required entrys dose not given.',
+	ALIAS_NOT_UNIQUE: 'Article\'s alias is not unique.',
 
 	NOT_IMAGE:		'It\'s not an image.',
 	FILE_TOO_BIG:	'The file is too large.',

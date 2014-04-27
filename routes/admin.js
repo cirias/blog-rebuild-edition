@@ -3,6 +3,7 @@ var multiparty = require('multiparty');
 // var Recaptcha = require('recaptcha').Recaptcha;
 var Article = require('./../models/Article.js');
 var Picture = require('./../models/Picture.js');
+var Tag = require('./../models/Tag.js');
 var message = require('../config.js').message;
 var config = require('../config.js').config;
 var utils = require('../utils.js');
@@ -61,21 +62,27 @@ exports.postArticle = function(req, res) {
 			return;
 		}
 
-		Article.insert(article, function(err) {
+		async.parallel([
+			function(callback) { Article.insert(article, callback); },
+			function(callback) { Tag.saveNews(article.tags, callback); }
+		], function(err) {
 			if (err) {
 				res.send({success: false, msg: err});
 			} else {
 				res.send({success: true, msg: message.INSERT_SUCCESS});
 			}
-		})
+		});
 	} else {
-		Article.update(article, function(err) {
+		async.parallel([
+			function(callback) { Article.update(article, callback); },
+			function(callback) { Tag.saveNews(article.tags, callback); }
+		], function(err) {
 			if (err) {
 				res.send({success: false, msg: err});
 			} else {
 				res.send({success: true, msg: message.UPDATE_SUCCESS});
 			}
-		})
+		});
 	}
 }
 

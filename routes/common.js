@@ -2,13 +2,12 @@ var Tag = require('./../models/Tag.js');
 var Article = require('./../models/Article.js');
 
 exports.getTags = function(req, res) {
-	Tag.SelectAll(function(err, results) {
+	Tag.selectAll(function(err, results) {
 		if (err) {
-			res.send('ERROR: 500\n' + err);
-			return;
+			res.send({success: false, msg: err});
+		} else {
+			res.send(results);
 		}
-		
-		res.send(results);
 	});
 }
 
