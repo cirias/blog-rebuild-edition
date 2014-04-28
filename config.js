@@ -12,7 +12,11 @@ exports.config = {
     MULTIPARTY_OPTIONS : {
     	uploadDir: './temp',
     	maxFilesSize: 1024 * 1024 * 10
-    } 
+    },
+    user : {
+    	MAX_LOGIN_ATTEMPTS : 5,
+		LOCK_TIME : 2 * 60 * 60 * 1000
+    }
 };//
 
 exports.relative = {

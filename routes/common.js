@@ -13,11 +13,11 @@ exports.getTags = function(req, res) {
 
 exports.getArticle = function(req, res) {
 	if (req.query.alias) {
-		Article.selectOneByAlias(req.query.alias, function(err, article) {
+		Article.selectByAlias(req.query.alias, function(err, article) {
 			if (err) {
 				res.send({success: false, msg: err});
 			} else {
-				res.send(Article.aftertreat(article));
+				res.send(article);
 			}
 		});
 	}
