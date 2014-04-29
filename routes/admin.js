@@ -1,9 +1,9 @@
 var async = require('async');
 var multiparty = require('multiparty');
-// var Recaptcha = require('recaptcha').Recaptcha;
 var Article = require('./../models/Article.js');
 var Picture = require('./../models/Picture.js');
 var Tag = require('./../models/Tag.js');
+var Textfile = require('./../models/Textfile.js');
 var message = require('../config.js').message;
 var config = require('../config.js').config;
 var utils = require('../utils.js');
@@ -122,3 +122,13 @@ exports.saveImage = function (req, res) {
 		});
 	});
 }
+
+exports.saveSiteInfo = function (req, res) {
+	Textfile.update(req.body, function(err) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send({success: true, msg: message.SITE_INFO_UPDATE_SUCCESS});
+		}
+	});
+};

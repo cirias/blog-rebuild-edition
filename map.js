@@ -23,4 +23,6 @@ module.exports = function(app) {
 	app.del('/article', admin.removeArticle);
 
 	app.post('/image', admin.saveImage);
+
+	app.post('/siteinfo', admin.saveSiteInfo);
 }

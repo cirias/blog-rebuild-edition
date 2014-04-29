@@ -16,6 +16,10 @@ exports.config = {
     user : {
     	MAX_LOGIN_ATTEMPTS : 5,
 		LOCK_TIME : 2 * 60 * 60 * 1000
+    },
+    textFile : {
+    	TEMPLATE_SITE_INFO_PATH : './template/services.js',
+    	CLIENT_SITE_INFO_PATH : 'D:/workspace/project/blog-clientside/app/js/services.js'
     }
 };//
 
@@ -28,6 +32,7 @@ exports.message = {
 	UPDATE_SUCCESS: 'Update Article Success.', 
 	REMOVE_SUCCESS:	'Remove Article Success.',
 	UPLOAD_IMAGE_SUCCESS: 'Upload Image Success.',
+	SITE_INFO_UPDATE_SUCCESS: 'Site Infomation Update Success.',
 
 	MISSING_ID:		'Missing ArticleId.',
 	MISSING_TITLE:	'Please input a title.',
