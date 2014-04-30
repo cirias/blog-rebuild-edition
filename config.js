@@ -6,7 +6,6 @@ exports.config = {
 	PUBLIC_KEY  : '6Lc7LPESAAAAAAII8Q419IuYbiVLWChDdgF09eWh',
     PRIVATE_KEY : '6Lc7LPESAAAAAFXQemWzWmyTkuQo56WFIMowANq3',
     DB_CONNECTION : 'mongodb://localhost/blog',
-    ARTICLE_INFO_FIELDS : 'title createDate hidden hits alias tags',
     STATIC_DIR : 'public',
     IMAGE_SUB_DIR : 'images',
     MULTIPARTY_OPTIONS : {

@@ -19,10 +19,14 @@ module.exports = function(app) {
 	app.get('/tags', common.getTags);
 
 	app.post('/article', admin.postArticle);
-	app.get('/article', common.getArticle);
+	app.put('/article', admin.updateArticle);
+	app.get('/article', admin.getArticle);
 	app.del('/article', admin.removeArticle);
 
 	app.post('/image', admin.saveImage);
 
 	app.post('/siteinfo', admin.saveSiteInfo);
+
+	app.get('/com/article', common.getArticle);
+	app.get('/com/articles', common.getArticles);
 }

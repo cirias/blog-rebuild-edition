@@ -13,7 +13,7 @@ exports.getTags = function(req, res) {
 
 exports.getArticle = function(req, res) {
 	if (req.query.alias) {
-		Article.selectByAlias(req.query.alias, function(err, article) {
+		Article.selectByAlias(req.query.alias, Article.CONTENT_FIELDS, function(err, article) {
 			if (err) {
 				res.send({success: false, msg: err});
 			} else {
@@ -21,4 +21,14 @@ exports.getArticle = function(req, res) {
 			}
 		});
 	}
+}
+
+exports.getArticles = function(req, res) {
+	Article.selectArray(req.query.pageNum, req.query.count, Article.CONTENT_FIELDS.join(' '), function(err, results) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send(results);
+		}
+	});
 }

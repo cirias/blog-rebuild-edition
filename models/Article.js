@@ -2,7 +2,6 @@
 var mongodb = require('./mongodb');
 var marked = require('marked');
 var message = require('../config.js').message;
-var utils = require('../utils.js');
 
 var Schema = mongodb.mongoose.Schema;
 
@@ -32,25 +31,24 @@ ArticleSchema.pre('save', function(next) {
     next();
 });
 
-ArticleSchema.static('selectArray', function(fields, callback) {
-    Article.find({}).select(fields).sort({createDate: '-1'}).exec(function(err, articles) {
-        var treatedArticles = [];
-        articles.forEach(function(article) {
-            treatedArticles.push(treat(article));
-        });
-        callback(err, treatedArticles);
-    });
+ArticleSchema.static('FIELDS', Object.keys(ArticleSchema.eachPath(function(){}).paths));
+
+ArticleSchema.static('INFO_FIELDS', ['title', 'createDate', 'hidden', 'hits', 'alias', 'tags']);
+
+ArticleSchema.static('CONTENT_FIELDS', ['title', 'createDate', 'htmlContent', 'metaDescription', 'metaKeywords']);
+
+ArticleSchema.static('selectArray', function(pageNum, count, fields, callback) {
+    pageNum = pageNum || 1;
+    count = count || Infinity;
+    Article.find({}).select(fields).sort({createDate: '-1'}).skip((pageNum - 1) * count).limit(count).exec(callback);
 });
 
 ArticleSchema.static('insert', function(article, callback) {
-    // if (article.mdContent) article.htmlContent = marked(article.mdContent);
-    
     new Article(article).save(callback);
 });
 
 ArticleSchema.static('update', function(newArticle, callback) {
     if (!newArticle._id) return callback(message.MISSING_ID);
-    // if (newArticle.mdContent) newArticle.htmlContent = marked(newArticle.mdContent);
     
     Article.findOne({_id: newArticle._id}, function(err, article) {
         if (err) return callback(err);
@@ -68,29 +66,11 @@ ArticleSchema.static('removeById', function(id, callback) {
     Article.remove({_id: id}, callback);
 });
 
-ArticleSchema.static('selectByAlias', function(alias, callback) {
-    Article.findOne({'alias': alias}, function(err, article) {
-        callback(err, treat(article));
-    });
+ArticleSchema.static('selectByAlias', function(alias, fields, callback) {
+    fields = fields || Article.FIELDS.join(' ');
+    Article.findOne({'alias': alias}).select(fields).exec(callback);
 });
 
 var Article = mongodb.mongoose.model("Article", ArticleSchema);
 var ArticleDAO = function(){};
 module.exports = Article;
-
-function treat(article) {
-    var treadedArticle = {};
-    var Keys = [];
-    Article.schema.eachPath(function(key) {
-        Keys.push(key);
-    });
-
-    for (var key in article) {
-        if (Keys.indexOf(key) == -1) continue;
-        if (key == 'createDate' && article.createDate) {treadedArticle.createDate = article.createDate.format('yyyy-MM-dd'); continue;}
-        if (key == 'modifyDate' && article.modifyDate) {treadedArticle.modifyDate = article.modifyDate.format('yyyy-MM-dd'); continue;}
-
-        treadedArticle[key] = article[key];
-    }
-    return treadedArticle;
-}

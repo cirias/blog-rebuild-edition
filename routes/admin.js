@@ -12,7 +12,7 @@ var utils = require('../utils.js');
 
 //获取文章信息
 exports.getArticleInfos = function(req, res) {
-	Article.selectArray(config.ARTICLE_INFO_FIELDS, function(err, results) {
+	Article.selectArray(null, null, Article.INFO_FIELDS.join(' '), function(err, results) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {
@@ -51,6 +51,19 @@ exports.removeArticles = function(req, res) {
 	});
 }
 
+//获取文章
+exports.getArticle = function(req, res) {
+	if (req.query.alias) {
+		Article.selectByAlias(req.query.alias, null, function(err, article) {
+			if (err) {
+				res.send({success: false, msg: err});
+			} else {
+				res.send(article);
+			}
+		});
+	}
+}
+
 //提交文章
 exports.postArticle = function(req, res) {
 	var article = req.body;
@@ -78,6 +91,21 @@ exports.postArticle = function(req, res) {
 			}
 		});
 	}
+}
+
+exports.updateArticle = function(req, res) {
+	var article = req.body;
+	
+	async.parallel([
+		function(callback) { Article.update(article, callback); },
+		function(callback) { Tag.saveNews(article.tags, callback); }
+	], function(err) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send({success: true, msg: message.UPDATE_SUCCESS});
+		}
+	});
 }
 
 //删除文章
