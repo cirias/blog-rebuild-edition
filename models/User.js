@@ -1,4 +1,5 @@
-var mongodb = require('./mongodb');
+var bcrypt = require('bcrypt');
+var mongodb = require('./mongodb.js');
 var message = require('../config.js').message;
 var config = require('../config.js').config.user;
 var utils = require('../utils.js');

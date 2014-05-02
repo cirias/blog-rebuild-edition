@@ -2,7 +2,7 @@ var Tag = require('./../models/Tag.js');
 var Article = require('./../models/Article.js');
 
 exports.getTags = function(req, res) {
-	Tag.selectAll(function(err, results) {
+	Tag.selectAll(Tag.status, function(err, results) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {
@@ -11,9 +11,19 @@ exports.getTags = function(req, res) {
 	});
 }
 
+exports.getDates = function(req, res) {
+	Article.getDates(Article.status, function(err, dates) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send(dates);
+		}
+	});
+}
+
 exports.getArticle = function(req, res) {
 	if (req.query.alias) {
-		Article.selectByAlias(req.query.alias, Article.CONTENT_FIELDS, function(err, article) {
+		Article.selectByAlias(req.query.alias, Article.CONTENT_FIELDS.join(' '), function(err, article) {
 			if (err) {
 				res.send({success: false, msg: err});
 			} else {
@@ -24,7 +34,11 @@ exports.getArticle = function(req, res) {
 }
 
 exports.getArticles = function(req, res) {
-	Article.selectArray(req.query.pageNum, req.query.count, Article.CONTENT_FIELDS.join(' '), function(err, results) {
+	var query = JSON.parse(req.query.query) || {};
+
+	query.hidden = false;
+
+	Article.selectArray(query, req.query.pageNum, req.query.count, Article.CONTENT_FIELDS.join(' '), function(err, results) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {

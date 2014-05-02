@@ -50,3 +50,26 @@ exports.deleteContentsInDir = function(p, callback) {
     recursivelyRemove(p, callback);
 }
 
+// 修改自JavaScript: The Good Parts by Douglas Crockford. Copyrigth 2008 Yahoo! Inc., 978-0-596-51774-8.
+// 中第45页关于Memoization的代码
+exports.memoizer = function(method) {
+    var memo = null;
+    var recur = function(status, callback) {
+        var result = memo;
+
+        if (result && status.getFresh()) {
+            return callback(null, result);
+        }
+
+        method(function(err, data) {
+            if (err) {
+                return callback(err, data);
+            }
+
+            memo = data;
+            status.setFresh();
+            return callback(null, data);
+        });
+    };
+    return recur;
+};

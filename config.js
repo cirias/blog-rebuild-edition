@@ -33,6 +33,8 @@ exports.message = {
 	UPLOAD_IMAGE_SUCCESS: 'Upload Image Success.',
 	SITE_INFO_UPDATE_SUCCESS: 'Site Infomation Update Success.',
 
+	MONTH_NAMES: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+
 	MISSING_ID:		'Missing ArticleId.',
 	MISSING_TITLE:	'Please input a title.',
 	MISSING_ALIAS:	'Please input an alias.',

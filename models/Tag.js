@@ -1,5 +1,6 @@
 var async = require('async');
-var mongodb = require('./mongodb');
+var mongodb = require('./mongodb.js');
+var utils = require('../utils.js');
 var Schema = mongodb.mongoose.Schema;
 
 var TagSchema = new Schema(
@@ -9,9 +10,18 @@ var TagSchema = new Schema(
     }
 );
 
-TagSchema.static('selectAll', function(callback){
-	this.find({}).exec(callback);
-});
+TagSchema.static('status', (function() {
+	var fresh = false;
+	return {
+		getFresh: function() {return this.fresh;},
+		setFresh: function() {this.fresh = true;},
+		setNotFresh: function() {this.fresh = false;}
+	}
+})());
+
+TagSchema.static('selectAll', utils.memoizer(function(callback) {
+    Tag.find({}).exec(callback);
+}));
 
 TagSchema.static('saveNews', function(newTags, callback){
 	this.find({}).exec(function(err, tags) {
@@ -23,7 +33,10 @@ TagSchema.static('saveNews', function(newTags, callback){
 				}).indexOf(newTag) < 0;
 		}), function(newTag, callback) {
 			new Tag({ name: newTag }).save(callback);
-		}, callback);
+		}, function(err) {
+			Tag.status.setNotFresh();
+			callback(err);
+		});
 	});
 });
 

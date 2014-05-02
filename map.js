@@ -18,6 +18,8 @@ module.exports = function(app) {
 
 	app.get('/tags', common.getTags);
 
+	app.get('/dates', common.getDates);
+
 	app.post('/article', admin.postArticle);
 	app.put('/article', admin.updateArticle);
 	app.get('/article', admin.getArticle);

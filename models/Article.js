@@ -1,7 +1,8 @@
 // var async = require('async');
-var mongodb = require('./mongodb');
+var mongodb = require('./mongodb.js');
 var marked = require('marked');
 var message = require('../config.js').message;
+var utils = require('../utils.js');
 
 var Schema = mongodb.mongoose.Schema;
 
@@ -35,16 +36,61 @@ ArticleSchema.static('FIELDS', Object.keys(ArticleSchema.eachPath(function(){}).
 
 ArticleSchema.static('INFO_FIELDS', ['title', 'createDate', 'hidden', 'hits', 'alias', 'tags']);
 
-ArticleSchema.static('CONTENT_FIELDS', ['title', 'createDate', 'htmlContent', 'metaDescription', 'metaKeywords']);
+ArticleSchema.static('CONTENT_FIELDS', ['title', 'alias', 'createDate', 'tags', 'htmlContent', 'metaDescription', 'metaKeywords']);
 
-ArticleSchema.static('selectArray', function(pageNum, count, fields, callback) {
+ArticleSchema.static('status', (function() {
+    var fresh = false;
+    return {
+        getFresh: function() {return this.fresh;},
+        setFresh: function() {this.fresh = true;},
+        setNotFresh: function() {this.fresh = false;}
+    }
+})());
+
+ArticleSchema.static('getDates', utils.memoizer(function(callback) {
+    Article.find({}, 'createDate').sort({createDate: '-1'}).exec(function(err, articles) {
+        var dates = [];
+        for (var i = 0; i < articles.length; i++) {
+            var month = articles[i].createDate.getMonth();
+            var year = articles[i].createDate.getFullYear();
+            var date = message.MONTH_NAMES[month] + ' ' + year;
+            var has = false;
+
+            for (var j = 0; j < dates.length; j++) {
+                if (dates[j].date == date) {
+                    has = true;
+                    break;
+                }
+            }
+
+            if (!has) {
+                dates.push({
+                    date: date,
+                    month: month + 1,
+                    year: year
+                });
+            }
+        }
+        callback(err, dates);
+    });
+}));
+
+ArticleSchema.static('selectArray', function(query, pageNum, count, fields, callback) {
+    if (typeof query == "string") {
+        query = JSON.parse(query) || {};
+    }
+    
     pageNum = pageNum || 1;
     count = count || Infinity;
-    Article.find({}).select(fields).sort({createDate: '-1'}).skip((pageNum - 1) * count).limit(count).exec(callback);
+    
+    Article.find(query).select(fields).sort({createDate: '-1'}).skip((pageNum - 1) * count).limit(count).exec(callback);
 });
 
 ArticleSchema.static('insert', function(article, callback) {
-    new Article(article).save(callback);
+    new Article(article).save(function(err) {
+        Article.status.setNotFresh();
+        callback(err);
+    });
 });
 
 ArticleSchema.static('update', function(newArticle, callback) {
@@ -56,7 +102,10 @@ ArticleSchema.static('update', function(newArticle, callback) {
             if (key == '_id') continue;
             article[key] = newArticle[key];
         }
-        article.save(callback);
+        article.save(function(err) {
+            Article.status.setNotFresh();
+            callback(err);
+        });
     });
 });
 
