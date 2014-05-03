@@ -26,7 +26,7 @@ var ArticleSchema = new Schema(
 ArticleSchema.pre('save', function(next) {
     var article = this;
 
-    if (!article.isModified('htmlContent')) return next();
+    if (!article.isModified('mdContent')) return next();
 
     article.htmlContent = marked(article.mdContent);
     next();

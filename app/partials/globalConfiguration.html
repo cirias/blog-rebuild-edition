@@ -1,0 +1,84 @@
+<div class="header">
+  <div class="container-title">
+    <h1 class="page-title">
+      <span class="glyphicon glyphicon-file"></span>Global Configuration
+    </h1>
+  </div>
+</div>
+
+<div class="row">
+	<div class="col-sm-3 col-md-2 subpane-sidebar">
+	  <ul class="nav nav-sidebar">
+	    <li class="active"><a href="#/globalConfiguration">Global Configuration</a></li>
+	  </ul>
+	</div>
+
+	<div class="col-sm-offset-3 col-md-offset-2 col-sm-9 col-md-10 container main">
+		<div class="alert alert-dismissable" ng-class="{'alert-success':message.success,'alert-danger':!message.success}" ng-show="message" ng-controller="MessageCtrl">
+	      <button type="button" class="close" ng-click="closeMsg()">&times;</button>
+	      <strong>{{ message.msg }}</strong>
+	    </div>
+
+		<form class="form-horizontal">
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Site Name</label>
+	          <div class="col-sm-5">
+	            <label class="text-inline">
+	              <input class="form-control" type="text" ng-model="siteInfo.name">
+	            </label>
+	            <label class="btn-inline pull-right">
+	              <button type="submit" class="btn btn-primary" ng-click="save()">Submit</button>
+	            </label>
+	          </div>
+	        </div>
+
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Site Subtitle</label>
+	          <div class="col-sm-5">
+	            <input class="form-control" type="text" ng-model="siteInfo.subtitle">
+	          </div>
+	        </div>
+
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Sidebar Description</label>
+	          <div class="col-sm-5">
+	            <input class="form-control" type="text" ng-model="siteInfo.description">
+	          </div>
+	        </div>
+
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Footer</label>
+	          <div class="col-sm-5">
+	            <input class="form-control" type="text" ng-model="siteInfo.footer">
+	          </div>
+	        </div>
+
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Meta Description</label>
+	          <div class="col-sm-5">
+	            <input class="form-control" type="text" ng-model="siteInfo.metaDescription">
+	          </div>
+	        </div>
+
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Meta Keywords</label>
+	          <div class="col-sm-5">
+	            <input class="form-control" type="text" ng-model="siteInfo.metaKeywords">
+	          </div>
+	        </div>
+
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Offline Message</label>
+	          <div class="col-sm-5">
+	            <input class="form-control" type="text">
+	          </div>
+	        </div>
+
+	        <div class="form-group">
+	          <div class="col-sm-offset-2 col-sm-5">
+	            <button class="btn btn-danger col-sm-12" type="button">Site Offine</button>
+	          </div>
+	        </div>
+	    </form>
+	</div>
+</div>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-cn" ng-app="app">
+<head>
+    <meta charset="utf-8">
+    <title ng-bind-template="{{ siteInfo.name }}"></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta meta-tag-description="siteInfo">
+    <meta meta-tag-keywords="siteInfo">
+    <meta name="author" content="Sirius">
+    <!-- Bootstrap core CSS -->
+    <link href="./bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="./css/blog.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航 -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#" ng-bind-template="{{ siteInfo.name }}"></a>
+        </div>
+        <div class="navbar-collapse collapse" style="height: 1px;">
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container">
+
+        <!-- 博客标题 -->
+        <div class="blog-header">
+            <h1 class="blog-title" ng-bind-template="{{ siteInfo.name }}"></h1>
+            <p class="lead blog-description" ng-bind-template="{{ siteInfo.subtitle }}"></p>
+        </div>
+        
+        <div class="row">
+            <div class="col-sm-9 blog-main">
+
+                <!-- ng-view -->
+                <div ng-view></div>
+
+            </div><!-- /.blog-main -->
+
+            <div class="col-sm-2 col-sm-offset-1 blog-sidebar">
+              <div class="sidebar-module sidebar-module-inset">
+                <h4>About</h4>
+                <p ng-bind-template="{{ siteInfo.description }}"></p>
+              </div>
+              <div class="sidebar-module">
+                <h4>Tags</h4>
+                <ul class="list-unstyled">
+                  <li ng-repeat="tag in tags"><a href="#/tag/{{ tag.name }}" ng-bind-template="{{ tag.name }}"></a></li>
+                </ul>
+              </div>
+              <div class="sidebar-module">
+                <h4>Archives</h4>
+                <ol class="list-unstyled">
+                  <li ng-repeat="date in dates">
+                    <a href="#/year/{{ date.year }}/month/{{ date.month }}" ng-bind-template="{{ date.date }}"></a>
+                  </li>
+                </ol>
+              </div>
+              <div class="sidebar-module">
+                <h4>Elsewhere</h4>
+                <ol class="list-unstyled">
+                  <li><a href="https://github.com/fhc023">GitHub</a></li>
+                </ol>
+              </div>
+            </div><!-- /.blog-sidebar --> 
+
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+
+<div class="blog-footer">
+  <p ng-bind-template="{{ siteInfo.footer }}"></p>
+  <p>
+    <a href="#">Back to top</a>
+  </p>
+</div>
+
+<script type="text/javascript"
+   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script src="./bower_components/jquery/dist/jquery.min.js"></script>
+
+<script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="./bower_components/angular/angular.min.js"></script>
+<script src="./bower_components/angular-route/angular-route.min.js"></script>
+<script src="./bower_components/angular-resource/angular-resource.min.js"></script>
+<script src="./bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
+
+<script src="./js/app/app.js"></script>
+<script src="./js/services.js"></script>
+<script src="./js/app/controllers.js"></script>
+<script src="./js/app/filters.js"></script>
+<script src="./js/app/directives.js"></script>
+<script src="./js/app/models.js"></script>
+<script src="./js/config.js"></script>
+<script src="./js/utils.js"></script>
+
+</body>
+</html>

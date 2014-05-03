@@ -1,0 +1,69 @@
+<div class="header">
+  <div class="container-title">
+    <h1 class="page-title">
+      <span class="glyphicon glyphicon-file"></span>Article Manager: Articles
+    </h1>
+  </div>
+</div>
+
+<!-- <a class="btn btn-subhead" data-toggle="collapse" data-target=".subhead-collapse">Toolbar   <i class="icon-wrench"></i></a> -->
+<a class="navbar-toggle" data-toggle="collapse" data-target=".subhead-collapse">Toolbar   </a>
+<div class="subhead">
+  <div class="">
+    <div class="container-fluid">
+      <!-- <div id="container-collapse" class="container-collapse"></div> -->
+      <div class="col-sm-offset-3 col-md-offset-2">
+        <div class="navbar-collapse collapse subhead-collapse">
+          <div class="btn-toolbar" id="toolbar">
+            <a type="button" href="#/newArticle" class="btn btn-xs btn-success">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+            <button type="button" class="btn btn-xs btn-danger pull-right" ng-click="removeArticles()"><span class="glyphicon glyphicon-trash"></span>&nbsp;Trash</button>
+            <button type="button" class="btn btn-xs btn-default pull-right" ng-click="updateArticles({hidden:true})"><span class="glyphicon glyphicon-remove-circle"></span>&nbsp;Unpublish</button>
+            <button type="button" class="btn btn-xs btn-default pull-right" ng-click="updateArticles({hidden:false})"><span class="glyphicon glyphicon-ok-circle"></span>&nbsp;Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-3 col-md-2 subpane-sidebar">
+    <ul class="nav nav-sidebar">
+      <li class="active"><a href="#/articleManager">Article Manager</a></li>
+      <li><a href="#/newArticle">New Article</a></li>
+    </ul>
+  </div>
+  <div class="col-sm-offset-3 col-md-offset-2 col-sm-9 col-md-10 main">
+    <div class="alert alert-dismissable" ng-class="{'alert-success':message.success,'alert-danger':!message.success}" ng-show="message" ng-controller="MessageCtrl">
+      <button type="button" class="close" ng-click="closeMsg()">&times;</button>
+      <strong>{{ message.msg }}</strong>
+    </div>
+    <!-- Table -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th width="1%"><input type="checkbox" ng-model="allChecked" ng-init="allChecked = false" ng-change="checkboxChanged()"></th>
+          <th width="1%" style="min-width:80px"><a href="#">Status</a></th>
+          <th width="30%"><a href="#">Title</a></th>
+          <th width="15%"><a href="#">Date</a></th>
+          <th width="1%"><a href="#">Hits</a></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="articleInfo in articlelist" ng-controller="ArticleEntryCtrl">
+          <td><input type="checkbox" ng-model="articleInfo.checked" ng-init="articleInfo.checked = false"></td>
+          <td><div class="btn-group btn-group-xs">
+            <button type="button" class="btn btn-default" btn-publish hidden="articleInfo.hidden" ng-click="changePublishStatus(setMessage)"><span class="glyphicon glyphicon-ok-circle"></span></button>
+            <button type="button" class="btn btn-default" ng-click="removeArticle(setMessage)"><span class="glyphicon glyphicon-trash"></span></button></div>
+          </td>
+          <td><a href="#/editArticle/{{ articleInfo.alias }}" ng-bind-template="{{ articleInfo.title }}"></a>&nbsp;(Alias: {{ articleInfo.alias }})</br>Tags: {{ articleInfo.tags.join(', ') }}</td>
+          <!-- <td ng-bind-template="{{ articleInfo.date.toDateString() }}"></td> -->
+          <td>{{ articleInfo.createDate.toDateFormat("yyyy-MM-dd") }}</td>
+          <!-- <td>{{ typeof articleInfo.createDate }}</td> -->
+          <td>{{ articleInfo.hits }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>

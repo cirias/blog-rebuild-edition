@@ -12,6 +12,14 @@ module.exports = function(app) {
 	    next();
 	});
 
+	app.get('/', function(request, response, next) {
+		response.sendfile('app/index.html');
+	});
+
+	app.get('/dashboard', function(request, response, next) {
+		response.sendfile('app/dashboard.html');
+	});
+
 	app.get('/articles', admin.getArticleInfos);
 	app.put('/articles', admin.updateArticles);
 	app.del('/articles', admin.removeArticles);

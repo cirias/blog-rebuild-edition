@@ -6,8 +6,8 @@ exports.config = {
 	PUBLIC_KEY  : '6Lc7LPESAAAAAAII8Q419IuYbiVLWChDdgF09eWh',
     PRIVATE_KEY : '6Lc7LPESAAAAAFXQemWzWmyTkuQo56WFIMowANq3',
     DB_CONNECTION : 'mongodb://localhost/blog',
-    STATIC_DIR : 'public',
-    IMAGE_SUB_DIR : 'images',
+    STATIC_DIR : 'app',
+    IMAGE_SUB_DIR : 'img',
     MULTIPARTY_OPTIONS : {
     	uploadDir: './temp',
     	maxFilesSize: 1024 * 1024 * 10

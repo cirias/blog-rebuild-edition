@@ -1,0 +1,17 @@
+<div data-ng-init="init()" infinite-scroll="incArticles()" infinite-scroll-distance="1">
+	<div class="blog-post" ng-repeat="article in articles" ng-controller="ArticleEntryCtrl">
+	    <h2 class="blog-post-title"><a class="blog-post-title" href="#/article/{{ article.alias }}">{{ article.title }}</a></h2>
+	    <p class="blog-post-meta">{{ article.createDate.toDateFormat("yyyy-MM-dd") }}</p>
+		<div ng-bind-html="article.safeHtml"></div>
+	</div><!-- articleFlow -->
+
+	<!-- <div class="center">
+		<ul class="pagination">
+			<li ng-disable="pager.previous"><a>&laquo;</a></li>
+			<li ng-show="pager.previousMore"><a>…</a></li>
+			<li ng-repeat="page in pager.pages" class="{{ page.active }}"><a>{{ page.num }}</a></li>
+			<li ng-show="pager.nextMore"><a>…</a></li>
+			<li ng-disable="pager.next"><a>&raquo;</a></li>
+		</ul>
+	</div> --><!-- pager -->
+</div>
