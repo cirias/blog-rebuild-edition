@@ -16,7 +16,9 @@
   },
   "description": "The backend of my personal blog.",
   "main": "app.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "grunt": "^0.4.4"
+  },
   "author": "Sirius",
   "license": "MIC",
   "repository": {
