@@ -5,7 +5,7 @@ public/images/*
 node_modules/
 bower_components/
 app/bower_components/
-app/img/
+app/img/*
 tmp
 .DS_Store
 .idea
