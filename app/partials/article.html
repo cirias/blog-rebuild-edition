@@ -1,5 +1,5 @@
 <div class="blog-post" data-ng-init="init()">
-    <h2 class="blog-post-title"><a class="blog-post-title" href="/article/{{ article.alias }}">{{ article.title }}</a></h2>
-    <p class="blog-post-meta">{{ article.createDate.toDateFormat("yyyy-MM-dd") }}</p>
-	<div ng-bind-html="article.safeHtml"></div>
+    <h2 class="blog-post-title"><a class="blog-post-title" href="/article/{{ article.alias }}">{{ article.title }}</a></h2><!-- 标题 -->
+    <p class="blog-post-meta">{{ article.createDate.toDateFormat("yyyy-MM-dd") }}</p><!-- 时间 -->
+	<div ng-bind-html="article.safeHtml"></div><!-- 内容 -->
 </div>

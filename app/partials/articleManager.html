@@ -6,12 +6,11 @@
   </div>
 </div>
 
-<!-- <a class="btn btn-subhead" data-toggle="collapse" data-target=".subhead-collapse">Toolbar   <i class="icon-wrench"></i></a> -->
+
 <a class="navbar-toggle" data-toggle="collapse" data-target=".subhead-collapse">Toolbar   </a>
 <div class="subhead">
   <div class="">
     <div class="container-fluid">
-      <!-- <div id="container-collapse" class="container-collapse"></div> -->
       <div class="col-sm-offset-3 col-md-offset-2">
         <div class="navbar-collapse collapse subhead-collapse">
           <div class="btn-toolbar" id="toolbar">
@@ -24,7 +23,7 @@
       </div>
     </div>
   </div>
-</div>
+</div><!-- 主控制菜单 -->
 
 <div class="row">
   <div class="col-sm-3 col-md-2 subpane-sidebar">
@@ -32,12 +31,15 @@
       <li class="active"><a href="#/articleManager">Article Manager</a></li>
       <li><a href="#/newArticle">New Article</a></li>
     </ul>
-  </div>
+  </div><!-- 侧边栏 -->
+
   <div class="col-sm-offset-3 col-md-offset-2 col-sm-9 col-md-10 main">
+
     <div class="alert alert-dismissable" ng-class="{'alert-success':message.success,'alert-danger':!message.success}" ng-show="message" ng-controller="MessageCtrl">
       <button type="button" class="close" ng-click="closeMsg()">&times;</button>
       <strong>{{ message.msg }}</strong>
-    </div>
+    </div><!-- 消息 -->
+
     <!-- Table -->
     <table class="table">
       <thead>
@@ -47,7 +49,7 @@
           <th width="30%"><a href="#">Title</a></th>
           <th width="15%"><a href="#">Date</a></th>
           <th width="1%"><a href="#">Hits</a></th>
-        </tr>
+        </tr><!-- 表头 -->
       </thead>
       <tbody>
         <tr ng-repeat="articleInfo in articlelist" ng-controller="ArticleEntryCtrl">
@@ -57,11 +59,9 @@
             <button type="button" class="btn btn-default" ng-click="removeArticle(setMessage)"><span class="glyphicon glyphicon-trash"></span></button></div>
           </td>
           <td><a href="#/editArticle/{{ articleInfo.alias }}" ng-bind-template="{{ articleInfo.title }}"></a>&nbsp;(Alias: {{ articleInfo.alias }})</br>Tags: {{ articleInfo.tags.join(', ') }}</td>
-          <!-- <td ng-bind-template="{{ articleInfo.date.toDateString() }}"></td> -->
           <td>{{ articleInfo.createDate.toDateFormat("yyyy-MM-dd") }}</td>
-          <!-- <td>{{ typeof articleInfo.createDate }}</td> -->
           <td>{{ articleInfo.hits }}</td>
-        </tr>
+        </tr><!-- 文章信息记录 -->
       </tbody>
     </table>
 

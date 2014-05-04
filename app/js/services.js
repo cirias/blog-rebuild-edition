@@ -16,5 +16,5 @@ angular.module('services', [])
   	metaDescription: "metaDescription.."
   })
   .value('articleConfig', {
-  	defaultCount: 1
+  	defaultCount: 1  // 文章每次动态加载的数量
   });

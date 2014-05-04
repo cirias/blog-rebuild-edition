@@ -70,7 +70,7 @@ var reasons = UserSchema.statics.failedLogin = {
     MAX_ATTEMPTS: 2
 };
 
-UserSchema.statics('getAuthenticated', function(username, password, cb) {
+UserSchema.static('getAuthenticated', function(username, password, cb) {
     this.findOne({ username: username }, function(err, user) {
         if (err) return cb(err);
 
@@ -116,4 +116,4 @@ UserSchema.statics('getAuthenticated', function(username, password, cb) {
     });
 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongodb.mongoose.model('User', UserSchema);

@@ -10,6 +10,7 @@ var TagSchema = new Schema(
     }
 );
 
+// 标示tag是否变动
 TagSchema.static('status', (function() {
 	var fresh = false;
 	return {
@@ -23,10 +24,12 @@ TagSchema.static('selectAll', utils.memoizer(function(callback) {
     Tag.find({}).exec(callback);
 }));
 
+// 保存新标签
 TagSchema.static('saveNews', function(newTags, callback){
 	this.find({}).exec(function(err, tags) {
 		if (err) return callback(err);
 
+		
 		async.each(newTags.filter(function(newTag) {
 			return tags.map(function(tag) {
 					return tag.name;

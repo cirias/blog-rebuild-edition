@@ -99,12 +99,14 @@ angular.module('myApp.controllers', [])
         });
       }
 
+      // 当收监听到事件'eCheckboxChanged'，设置checked属性
       $scope.$on('eCheckboxChanged', function(event, data) {
         $scope.articleInfo.checked = data;
       });
     }])
   // 新建文章控制器
   .controller('NewArticleCtrl', ['$scope', '$upload', 'Tag', 'Article', 'BackendUrl', function($scope, $upload, Tag, Article, BackendUrl) {
+    // 初始化article、tags数据对象
     $scope.init = function() {
       $scope.tags = Tag.query();
       $scope.article = {};
@@ -115,10 +117,13 @@ angular.module('myApp.controllers', [])
       $scope.article.modifyDate = new Date().toDateInputValue();
     }
     
+    // 保存文章
     $scope.next = function(article) {
       var article = new Article($scope.article);
       article.$save(function(data) {
         $scope.$emit('eMessageArive', data);
+
+        // 若成功则重新初始化数据
         if (data.success) {
           $scope.init();
         }
@@ -127,7 +132,7 @@ angular.module('myApp.controllers', [])
   }])
   // 编辑文章控制器
   .controller('EditArticleCtrl', ['$scope', '$routeParams', 'Tag', 'Article', function($scope, $routeParams, Tag, Article) {
-
+    // 初始化article、tags数据对象
     $scope.article = Article.get({alias: $routeParams.alias}, function() {
       Tag.query(function(tags) {
         $scope.tags = tags;
@@ -145,9 +150,10 @@ angular.module('myApp.controllers', [])
       $scope.article.modifyDate = $scope.article.modifyDate.toDateFormat('yyyy-MM-dd');
 
       $scope.article.htmlContent = $scope.article.htmlContent || ' ';
-      $scope.article.imageIds = [] || $scope.article.imageIds;
+      $scope.article.imageIds = $scope.article.imageIds || [];
     });
 
+    // 更新文章
     $scope.next = function(article) {
       var article = new Article($scope.article);
       article.$update(function(data) {
@@ -165,15 +171,18 @@ angular.module('myApp.controllers', [])
         }
       };
 
+      // 当监听到事件'TagChanged'，增减article.tags
       $scope.$on('TagChanged', function(event, tag) {
         if (tag.checked) $scope.article.tags.push(tag.name);
         else $scope.article.tags.splice($scope.article.tags.indexOf(tag.name),1);
       });
 
+      // 打开文件选择窗口
       $scope.openFileForm = function() {
         $('file').click();
       }
 
+      // 上传文件
       $scope.onFileSelect = function($files) {
         var file = $files[0];
         $scope.upload = $upload.upload({
@@ -181,15 +190,19 @@ angular.module('myApp.controllers', [])
           method: 'POST',
           file: file
         }).success(function(data) {
+          // 设置消息内容
           if (data.success) {
             data.otherMsg = BackendUrl + '/' +data.image.url;
             $scope.article.imageIds.push(data.image._id);
             window.prompt("Copy to clipboard: Ctrl+C, Enter", data.otherMsg);
           }
+
+          // 发送消息
           $scope.$emit('eMessageArive', data);
         });
       }
 
+      // 保存文章接口
       $scope.saveArticle = function(next) {
         if (!$scope.articleForm.$valid) return;
 
@@ -204,6 +217,7 @@ angular.module('myApp.controllers', [])
       }])
   // 全局设置控制器
   .controller('GlobalConfigurationCtrl', ['$scope', 'SiteInfo', 'siteInfo', function($scope, SiteInfo, siteInfo) {
+    // 初始化数据
     $scope.siteInfo = siteInfo;
 
     $scope.save = function() {
@@ -212,8 +226,4 @@ angular.module('myApp.controllers', [])
         $scope.$emit('eMessageArive', data);
       });
     }
-
-    // $scope.closeMsg = function() {
-    //   $scope.message = null;
-    // }
   }]);

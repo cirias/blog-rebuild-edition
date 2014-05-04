@@ -21,10 +21,12 @@ Date.prototype.format = function (fmt) { //author: meizz
     return fmt;
 }
 
+// String类型时间的format接口
 String.prototype.toDateFormat = function (fmt) {
     return new Date(this).format(fmt);
 }
 
+// 获取型为"yyyy-MM-dd"的当前时间
 Date.prototype.toDateInputValue = (function() {
     var local = new Date(this);
     local.setMinutes(this.getMinutes() - this.getTimezoneOffset());

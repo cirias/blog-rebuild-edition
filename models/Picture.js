@@ -14,9 +14,63 @@ var PictureSchema = new Schema(
         path :              String,
         url :               String,
         type :              String, 
-        aricleIds :         {type: [String], default: []}
+        articleIds :         {type: [String], default: []}
     }
 );
+
+PictureSchema.pre('save', function(next) {
+    var picture = this;
+
+    picture.path = path.join(relative.IMAGE_DIR, picture._id+'.'+picture.type);
+    picture.url = path.join(config.IMAGE_SUB_DIR, picture._id+'.'+picture.type);
+
+    next();
+});
+
+PictureSchema.pre('remove', function(next) {
+    var picture = this;
+
+    if (fs.existsSync(picture.path)) {
+        fs.unlinkSync(picture.path);
+    }
+
+    next();
+});
+
+PictureSchema.static('updateByArticleIds', function(ids, articleId, callback) {
+    Picture.find({_id: {$in: ids}}).exec(function(err, pictures) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        pictures.forEach(function(picture) {
+            if (picture.articleIds.indexOf(articleId) < 0 ) {
+                picture.articleIds.push(articleId);
+                picture.save(callback);
+            }
+        });
+    });
+});
+
+PictureSchema.static('removeByArticleIds', function(ids, articleId, callback) {
+    Picture.find({_id: {$in: ids}}).exec(function(err, pictures) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        pictures.forEach(function(picture) {
+            if (picture.articleIds.indexOf(articleId) > 0 ) {
+                picture.articleIds.pop(articleId);
+            }
+
+            if (picture.articleIds.length === 0) {
+                picture.remove(callback);
+            }
+        });
+    });
+});
 
 var Picture = mongodb.mongoose.model("Picture", PictureSchema);
 var PictureDAO = function(){};

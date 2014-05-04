@@ -14,7 +14,10 @@ rl.question("Your username: ", function(username) {
   			} else {
   				console.log('Create user success.');
   			}
-			rl.close();
+  			
+        rl.question("Pause...", function() {
+          rl.close();
+        });
   		});
 	});
 });

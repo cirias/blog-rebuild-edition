@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('config', [])
+	// 后端地址
 	.value('BackendUrl', 'http://localhost:3000')
+	// 路由正则表达式
 	.value('Paths', {
 		ALL: /^\/$/,
 		BY_TAG: /^\/tag\/[^\/\s]*$/,

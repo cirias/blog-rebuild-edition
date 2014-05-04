@@ -9,6 +9,7 @@ angular.module('app.directives', []).
       elm.text(version);
     };
   }]).
+  // 网页元数据加载器
   directive('metaTagDescription', [function() {
     return {
     	scope: '=',
@@ -23,20 +24,3 @@ angular.module('app.directives', []).
       replace: true
     };
   }]);
-  // directive('scroll', ['$window', function($window) {
-  //   return {
-  //     restrict: 'A',
-  //     scope: '=',
-  //     link: function(scope, elm, attrs) {
-  //       angular.element($window).bind("scroll", function() {
-  //         if (Math.abs(elm.context.scrollHeight-this.pageYOffset) <= 100) {
-  //           // console.log($window);
-  //           scope.incArticles();
-  //           scope.$apply();
-  //         }
-  //       });
-  //     }
-  //   };
-  // }]);
-  // pageYOffset: 2529
-  // scrollHeight: 2462

@@ -1,5 +1,6 @@
 'use strict';
 
+// 与服务端交互的数据资源对象
 angular.module('app.models', [])
 	.factory('Articles', ['$resource', 'BackendUrl', function($resource, BackendUrl) {
 		return $resource(BackendUrl + '/com/articles', null, {

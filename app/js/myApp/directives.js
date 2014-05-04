@@ -9,6 +9,7 @@ angular.module('myApp.directives', []).
       elm.text(version);
     };
   }])
+  // 监视hidden变量，根据其值改变图标，'btnPublish'匹配属性'btn-publish'
   .directive('btnPublish', function() {
 	    return {
 	    	restrict: 'A',

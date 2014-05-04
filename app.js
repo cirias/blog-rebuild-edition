@@ -10,6 +10,8 @@ var http = require('http');
 var path = require('path');
 var config = require('./config').config;
 var map = require('./map');
+var session = require('express-session')
+var RedisStore = require('connect-redis')(session);
 
 var app = express();
 
@@ -22,6 +24,19 @@ app.use(express.json());
 app.use(express.urlencoded());
 // app.use(express.multipart());
 app.use(express.methodOverride());
+
+// development only
+if ('development' == app.get('env')) {
+	app.use(express.cookieParser('my secret here'));
+	app.use(express.session({
+		key : 'sirius.sid',
+		secret : 'flufy cat',
+		cookie : {
+			maxAge : 60000 * 60 * 24
+		}
+	}));
+}
+
 app.use(app.router);
 app.use(express.static(path.join(__dirname, config.STATIC_DIR)));
 // app.use(utils.sanitize(req.body));
@@ -29,7 +44,7 @@ app.use(express.static(path.join(__dirname, config.STATIC_DIR)));
 
 // development only
 if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+	app.use(express.errorHandler());
 }
 
 // production only

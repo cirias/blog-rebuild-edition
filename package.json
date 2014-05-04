@@ -18,7 +18,9 @@
   "description": "The backend of my personal blog.",
   "main": "app.js",
   "devDependencies": {
-    "grunt": "^0.4.4"
+    "grunt": "^0.4.4",
+    "express-session": "^1.0.4",
+    "connect-redis": "^2.0.0"
   },
   "author": "Sirius",
   "license": "MIC",

@@ -3,6 +3,7 @@ var multiparty = require('multiparty');
 var Article = require('./../models/Article.js');
 var Picture = require('./../models/Picture.js');
 var Tag = require('./../models/Tag.js');
+var User = require('./../models/User.js');
 var Textfile = require('./../models/Textfile.js');
 var message = require('../config.js').message;
 var config = require('../config.js').config;
@@ -19,7 +20,7 @@ exports.getArticleInfos = function(req, res) {
 			res.send(results);
 		}
 	});
-}
+};
 
 //批量更新
 exports.updateArticles = function(req, res) {
@@ -34,7 +35,7 @@ exports.updateArticles = function(req, res) {
 			res.send({success: true, msg: message.UPDATE_SUCCESS});
 		}
 	});
-}
+};
 
 //批量删除
 exports.removeArticles = function(req, res) {
@@ -49,7 +50,7 @@ exports.removeArticles = function(req, res) {
 			res.send({success: true, msg: message.REMOVE_SUCCESS});
 		}
 	});
-}
+};
 
 //获取文章
 exports.getArticle = function(req, res) {
@@ -62,36 +63,23 @@ exports.getArticle = function(req, res) {
 			}
 		});
 	}
-}
+};
 
 //提交文章
 exports.postArticle = function(req, res) {
 	var article = req.body;
 
-	if (!article._id) {
-		async.parallel([
-			function(callback) { Article.insert(article, callback); },
-			function(callback) { Tag.saveNews(article.tags, callback); }
-		], function(err) {
-			if (err) {
-				res.send({success: false, msg: err});
-			} else {
-				res.send({success: true, msg: message.INSERT_SUCCESS});
-			}
-		});
-	} else {
-		async.parallel([
-			function(callback) { Article.update(article, callback); },
-			function(callback) { Tag.saveNews(article.tags, callback); }
-		], function(err) {
-			if (err) {
-				res.send({success: false, msg: err});
-			} else {
-				res.send({success: true, msg: message.UPDATE_SUCCESS});
-			}
-		});
-	}
-}
+	async.parallel([
+		function(callback) { Article.insert(article, callback); },
+		function(callback) { Tag.saveNews(article.tags, callback); }
+	], function(err) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send({success: true, msg: message.INSERT_SUCCESS});
+		}
+	});
+};
 
 exports.updateArticle = function(req, res) {
 	var article = req.body;
@@ -106,7 +94,7 @@ exports.updateArticle = function(req, res) {
 			res.send({success: true, msg: message.UPDATE_SUCCESS});
 		}
 	});
-}
+};
 
 //删除文章
 exports.removeArticle = function(req, res) {
@@ -117,9 +105,9 @@ exports.removeArticle = function(req, res) {
 			res.send({success: true, msg: message.REMOVE_SUCCESS});
 		}
 	});
-}
+};
 
-exports.saveImage = function (req, res) {
+exports.saveImage = function(req, res) {
 	var form = new multiparty.Form(config.MULTIPARTY_OPTIONS);
 
 	form.parse(req, function(err, fields, files){
@@ -149,9 +137,9 @@ exports.saveImage = function (req, res) {
 			utils.deleteContentsInDir(config.MULTIPARTY_OPTIONS.uploadDir);
 		});
 	});
-}
+};
 
-exports.saveSiteInfo = function (req, res) {
+exports.saveSiteInfo = function(req, res) {
 	Textfile.update(req.body, function(err) {
 		if (err) {
 			res.send({success: false, msg: err});
@@ -159,4 +147,59 @@ exports.saveSiteInfo = function (req, res) {
 			res.send({success: true, msg: message.SITE_INFO_UPDATE_SUCCESS});
 		}
 	});
+};
+
+exports.login = function(req, res) {
+	if (req.cookies.user) {
+		req.session.username = req.cookies.user.username;
+		res.send({success: true});
+		return;
+	}
+	console.log(req.body.remember);
+
+	User.getAuthenticated(req.body.username, req.body.password, function(err, user, reasons) {
+		if (err) {
+			res.send({success: false, msg: err});
+			return;
+		}
+
+		switch (reasons) {
+			case User.failedLogin.NOT_FOUND:
+				res.send({success: false, msg: message.INCORRECT_OR_NOT_FOUND});
+				return;
+			case User.failedLogin.PASSWORD_INCORRECT:
+				res.send({success: false, msg: message.INCORRECT_OR_NOT_FOUND});
+				return;
+			case User.failedLogin.MAX_ATTEMPTS:
+				res.send({success: false, msg: message.USER_LOCKED});
+				return;
+		}
+
+		req.session.username = user.username;
+
+		if (req.body.remember) {
+			var month = 30 * 24 * 60 * 60 * 1000;
+			res.cookie('user', user, { maxAge: month });
+		}
+
+		res.send({success: true});
+
+		return;
+	});
+};
+
+exports.authenticate = function(req, res, next) {
+
+	if (!req.session.username) {
+		if (req.cookies.user) {
+			req.session.username = req.cookies.user.username;
+			next();
+			return;
+		} else {
+			res.redirect('/login');
+			return;
+		}
+	}
+
+	next();
 };

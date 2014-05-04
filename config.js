@@ -52,5 +52,8 @@ exports.message = {
 	NOT_IMAGE:		'It\'s not an image.',
 	FILE_TOO_BIG:	'The file is too large.',
 
-	WRONG_ID:		'Wrong id.'
+	WRONG_ID:		'Wrong id.',
+
+	INCORRECT_OR_NOT_FOUND:		'Password incorrect or the user not found.',
+	USER_LOCKED: 				'Attempts too many times, the user has been locked.'
 };

@@ -3,6 +3,7 @@
 /* Controllers */
 
 angular.module('app.controllers', [])
+  // 单篇文章的画面控制器
   .controller('ArticleCtrl', ['$scope', '$routeParams', '$rootScope', '$sce', 'Article', 'Tag', 'siteInfo', function($scope, $routeParams, $rootScope, $sce, Article, Tag, siteInfo) {
     $scope.init = function() {
       $rootScope.siteInfo = siteInfo;
@@ -12,22 +13,27 @@ angular.module('app.controllers', [])
         $rootScope.siteInfo.metaKeywords = $scope.article.metaKeywords;
         $rootScope.siteInfo.metaDescription = $scope.article.metaDescription;
 
+        // 授信htmlContent
         $scope.article.safeHtml = $sce.trustAsHtml($scope.article.htmlContent);
       });
     };
 
   }])
+  // 多篇文章的画面控制器
   .controller('ArticlesCtrl', ['$scope', '$sce', '$location', '$routeParams', '$rootScope', 'Paths', 'articleConfig', 'siteInfo', 'Articles', 'Tag', 'Dates', function($scope, $sce, $location, $routeParams, $rootScope, Paths, articleConfig, siteInfo, Articles, Tag, Dates) {
-    var params = null;
+    var params = null;    // 文章查询参数
 
+    // 初始化数据
     $scope.init = function() {
+      // 初始化基本数据到根作用域
       $rootScope.siteInfo = siteInfo;
       $rootScope.tags = Tag.query();
       $rootScope.dates = Dates.query();
 
-      var query = null;
-      var path = $location.path();
+      var query = null;   // 查询语句
+      var path = $location.path();    // 当前相对url
     
+      // 匹配不同的路由正则表达式，设置查询
       switch (true) {
         case Paths.ALL.test(path):
           query = {};
@@ -38,21 +44,26 @@ angular.module('app.controllers', [])
         case Paths.BY_DATE.test(path):
           var start = new Date($routeParams.year, $routeParams.month - 1, 1);
           var end = new Date($routeParams.year, $routeParams.month, 1);
+
+          // 查询符合 start <= createDate < end 
           query = {
             createDate: {$gte: start, $lt: end}
           };
           break;
       }
 
+      // 组装参数
       params = {
         query: JSON.stringify(query),
         pageNum: $routeParams.pageNum || 1,
         count: $routeParams.count || articleConfig.defaultCount
       };
 
+      // 获取文章
       $scope.articles = Articles.query(params);
     };
 
+    // 加载文章
     $scope.incArticles = function() {
       params.pageNum = params.pageNum + 1;
       Articles.query(params, function(newArticles) {
@@ -64,25 +75,6 @@ angular.module('app.controllers', [])
 
   }])
   .controller('ArticleEntryCtrl', ['$scope', '$sce', function($scope, $sce) {
+    // 授信htmlContent
     $scope.article.safeHtml = $sce.trustAsHtml($scope.article.htmlContent);
-  }])
-  .controller('TagArticlesCtrl', ['$scope', '$routeParams', 'Articles', function($scope, $routeParams, Articles) {
-    $scope.init = function() {
-      $scope.articles = Articles.query({
-        query: {tag: $routeParams.tag},
-        pageNum: $routeParams.pageNum || 1,
-        count: $routeParams.count || articleConfig.defaultCount
-      });
-    }
-
-  }])
-  .controller('DateArticlesCtrl', ['$scope', '$routeParams', 'Articles', function($scope, $routeParams, Articles) {
-    $scope.init = function() {
-      $scope.articles = Articles.query({
-        query: {year: $routeParams.year, month: $routeParams.month},
-        pageNum: $routeParams.pageNum || 1,
-        count: $routeParams.count || articleConfig.defaultCount
-      });
-    }
-
   }]);

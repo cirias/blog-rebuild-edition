@@ -16,6 +16,20 @@ module.exports = function(app) {
 		response.sendfile('app/index.html');
 	});
 
+	app.get('/tags', common.getTags);
+
+	app.get('/dates', common.getDates);
+
+	app.get('/com/article', common.getArticle);
+	app.get('/com/articles', common.getArticles);
+
+	app.get('/login', function(req, res) {
+		res.sendfile('app/login.html');
+	});
+	app.post('/login', admin.login);
+
+	app.all(/^\/dashboard$|^\/articles$|^\/article$|^\/image$|^\/siteinfo$/, admin.authenticate);
+
 	app.get('/dashboard', function(request, response, next) {
 		response.sendfile('app/dashboard.html');
 	});
@@ -23,10 +37,6 @@ module.exports = function(app) {
 	app.get('/articles', admin.getArticleInfos);
 	app.put('/articles', admin.updateArticles);
 	app.del('/articles', admin.removeArticles);
-
-	app.get('/tags', common.getTags);
-
-	app.get('/dates', common.getDates);
 
 	app.post('/article', admin.postArticle);
 	app.put('/article', admin.updateArticle);
@@ -36,7 +46,4 @@ module.exports = function(app) {
 	app.post('/image', admin.saveImage);
 
 	app.post('/siteinfo', admin.saveSiteInfo);
-
-	app.get('/com/article', common.getArticle);
-	app.get('/com/articles', common.getArticles);
 }
