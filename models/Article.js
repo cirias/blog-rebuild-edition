@@ -34,6 +34,12 @@ ArticleSchema.pre('save', function(next) {
     next();
 });
 
+// 保存后
+ArticleSchema.post('save', function() {
+    // 设置文章变动
+    Article.status.setNotFresh();
+});
+
 // 设置静态变量
 ArticleSchema.static('FIELDS', Object.keys(ArticleSchema.eachPath(function(){}).paths));
 
@@ -100,17 +106,23 @@ ArticleSchema.static('selectArray', function(query, pageNum, count, fields, call
 });
 
 // 插入文章
-ArticleSchema.static('insert', function(article, callback) {
-    new Article(article).save(function(err) {
+// ArticleSchema.static('insert', function(article, callback) {
+//     new Article(article).save(function(err, article) {
+//         if (err) return callback(err);
 
-        // 设置文章变动
-        Article.status.setNotFresh();
-        callback(err);
-    });
-});
+//         // 设置文章变动
+//         Article.status.setNotFresh();
+
+//         Picture.updateByArticleIds(article.imageIds, article._id, function(err) {
+//             if (err) return callback(err);
+//         });
+
+//         callback(null);
+//     });
+// });
 
 // 更新文章
-ArticleSchema.static('update', function(newArticle, callback) {
+ArticleSchema.static('updateById', function(newArticle, callback) {
     if (!newArticle._id) return callback(message.MISSING_ID);
     
     // 根据id查找文章
@@ -124,12 +136,7 @@ ArticleSchema.static('update', function(newArticle, callback) {
         }
 
         // 保存
-        article.save(function(err) {
-
-            // 设置文章变动
-            Article.status.setNotFresh();
-            callback(err);
-        });
+        article.save(callback);
     });
 });
 

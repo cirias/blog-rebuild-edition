@@ -24,7 +24,11 @@ exports.getArticleInfos = function(req, res) {
 
 //批量更新
 exports.updateArticles = function(req, res) {
-	async.each(req.body.articles, function(article, callback) {
+	var articles = Array.isArray(req.query.articles) ? req.query.articles : [req.query.articles];
+	// var articles = req.body.articles;
+	// Article.update({_id: {$in: articles.map(function(article) {return article._id})}, )
+
+	async.each(articles, function(article, callback) {
 		Article.update(article, function(err) {
 			callback(err);
 		});
@@ -39,7 +43,9 @@ exports.updateArticles = function(req, res) {
 
 //批量删除
 exports.removeArticles = function(req, res) {
-	async.each(req.query.articleIds, function(id, callback) {
+	var articleIds = Array.isArray(req.query.articleIds) ? req.query.articleIds : [req.query.articleIds];
+
+	async.each(articleIds, function(id, callback) {
 		Article.removeById(id, function(err) {
 			callback(err);
 		});
@@ -67,11 +73,12 @@ exports.getArticle = function(req, res) {
 
 //提交文章
 exports.postArticle = function(req, res) {
-	var article = req.body;
+	var article = new Article(req.body);
 
 	async.parallel([
-		function(callback) { Article.insert(article, callback); },
-		function(callback) { Tag.saveNews(article.tags, callback); }
+		function(callback) { article.save(callback); },
+		function(callback) { Tag.saveNews(article.tags, callback); },
+		function(callback) { Picture.updateByArticleIds(article.imageIds, article._id, callback) }
 	], function(err) {
 		if (err) {
 			res.send({success: false, msg: err});
@@ -85,8 +92,9 @@ exports.updateArticle = function(req, res) {
 	var article = req.body;
 	
 	async.parallel([
-		function(callback) { Article.update(article, callback); },
-		function(callback) { Tag.saveNews(article.tags, callback); }
+		function(callback) { Article.updateById(article, callback); },
+		function(callback) { Tag.saveNews(article.tags, callback); },
+		function(callback) { Picture.updateByArticleIds(article.imageIds || [], article._id, callback) }
 	], function(err) {
 		if (err) {
 			res.send({success: false, msg: err});
@@ -98,13 +106,33 @@ exports.updateArticle = function(req, res) {
 
 //删除文章
 exports.removeArticle = function(req, res) {
-	Article.removeById(req.query.id, function(err) {
+	Article.findById(req.query.id, function(err, article) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {
-			res.send({success: true, msg: message.REMOVE_SUCCESS});
+			async.parallel([
+				function(callback) { article.remove(callback) },
+				function(callback) { Picture.removeByArticleIds(article.imageIds, article._id, callback) }
+			], function(err) {
+				if (err) {
+					res.send({success: false, msg: err});
+				} else {
+					res.send({success: true, msg: message.REMOVE_SUCCESS});
+				}
+			});
 		}
 	});
+
+	// async.parallel([
+	// 	function(callback) { Article.removeById(req.query.id, callback) },
+	// 	function(callback) { Picture.removeByArticleIds() }
+	// ], function(err) {
+	// 	if (err) {
+	// 		res.send({success: false, msg: err});
+	// 	} else {
+	// 		res.send({success: true, msg: message.REMOVE_SUCCESS});
+	// 	}
+	// });
 };
 
 exports.saveImage = function(req, res) {
@@ -121,13 +149,17 @@ exports.saveImage = function(req, res) {
 		file.path = files.file[0].path;
 		file.size = files.file[0].size;
 
-		var verifyMsg = Picture.verify(file);
-		if (verifyMsg.length != 0) {
-			res.send({success: false, msg: verifyMsg});
-			return;
-		}
+		// var verifyMsg = Picture.verify(file);
+		// if (verifyMsg.length != 0) {
+		// 	res.send({success: false, msg: verifyMsg});
+		// 	return;
+		// }
 
-		Picture.save(file, function(err, data) {
+		Picture.insertAndSave({
+	        name: file.name,
+	        originPath: file.path,
+	        type: file.type.split('/')[1].toLowerCase()
+	    }, function(err, data) {
 			if (err) {
 				res.send({success: false, msg: err});
 			} else {
@@ -136,6 +168,22 @@ exports.saveImage = function(req, res) {
 
 			utils.deleteContentsInDir(config.MULTIPARTY_OPTIONS.uploadDir);
 		});
+
+		// new Picture({
+	 //        name: file.name,
+	 //        originPath: file.path,
+	 //        type: file.type.split('/')[1].toLowerCase()
+	 //    })
+	 //    .pretreat()
+	 //    .save(file, function(err, data) {
+		// 	if (err) {
+		// 		res.send({success: false, msg: err});
+		// 	} else {
+		// 		res.send({success: true, msg: message.UPLOAD_IMAGE_SUCCESS, image: data});
+		// 	}
+
+		// 	utils.deleteContentsInDir(config.MULTIPARTY_OPTIONS.uploadDir);
+		// });
 	});
 };
 

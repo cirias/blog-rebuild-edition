@@ -42,7 +42,7 @@ angular.module('myApp.controllers', [])
 
       // 利用model批量删除，返回消息data
       Articles.remove({articleIds: articleIds}, function(data) {
-        setMessage(data);
+        $scope.setMessage(data);
       });
     }
 
@@ -62,12 +62,12 @@ angular.module('myApp.controllers', [])
 
       // 利用model批量更新，返回消息data
       Articles.update({articles: articles}, function(data) {
-        setMessage(data);
+        $scope.setMessage(data);
       });
     }
 
     // 消息处理公共方法
-    $scope.setMessage = function setMessage(message) {
+    $scope.setMessage = function(message) {
       // 发送消息到达事件
       $scope.$emit('eMessageArive', message);
 
