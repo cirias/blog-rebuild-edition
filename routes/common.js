@@ -22,16 +22,16 @@ exports.getDates = function(req, res) {
 }
 
 exports.getArticle = function(req, res) {
-	if (req.query.alias) {
-		Article.selectByAlias(req.query.alias, Article.CONTENT_FIELDS.join(' '), function(err, article) {
-			if (err) {
-				res.send({success: false, msg: err});
-			} else {
-				res.send(article);
-			}
-		});
-	}
-}
+	Article.findOne({'alias': req.query.alias})
+	.select(Article.CONTENT_FIELDS.join(' '))
+	.exec(function(err, article) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send(article);
+		}
+	});
+};
 
 exports.getArticles = function(req, res) {
 	var query = JSON.parse(req.query.query) || {};

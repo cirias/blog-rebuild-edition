@@ -24,9 +24,19 @@ exports.getArticleInfos = function(req, res) {
 
 //批量更新
 exports.updateArticles = function(req, res) {
-	var articles = Array.isArray(req.query.articles) ? req.query.articles : [req.query.articles];
+	var articleIds = Array.isArray(req.query.articleIds) ? req.query.articleIds : [req.query.articleIds];
+	// var articles = Array.isArray(req.query.articles) ? req.query.articles : [req.query.articles];
 	// var articles = req.body.articles;
 	// Article.update({_id: {$in: articles.map(function(article) {return article._id})}, )
+
+	Article.update({_id: {$in: articleIds}}, {$set: article}, { multi: true })
+	.exec(function(err) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send({success: true, msg: message.REMOVE_SUCCESS});
+		}
+	});
 
 	async.each(articles, function(article, callback) {
 		Article.update(article, function(err) {
@@ -45,30 +55,39 @@ exports.updateArticles = function(req, res) {
 exports.removeArticles = function(req, res) {
 	var articleIds = Array.isArray(req.query.articleIds) ? req.query.articleIds : [req.query.articleIds];
 
-	async.each(articleIds, function(id, callback) {
-		Article.removeById(id, function(err) {
-			callback(err);
-		});
-	}, function(err) {
+	Article.remove({_id: {$in: articleIds}})
+	.exec(function(err) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {
 			res.send({success: true, msg: message.REMOVE_SUCCESS});
 		}
 	});
+
+	// async.each(articleIds, function(id, callback) {
+	// 	Article.removeById(id, function(err) {
+	// 		callback(err);
+	// 	});
+	// }, function(err) {
+	// 	if (err) {
+	// 		res.send({success: false, msg: err});
+	// 	} else {
+	// 		res.send({success: true, msg: message.REMOVE_SUCCESS});
+	// 	}
+	// });
 };
 
 //获取文章
 exports.getArticle = function(req, res) {
-	if (req.query.alias) {
-		Article.selectByAlias(req.query.alias, null, function(err, article) {
-			if (err) {
-				res.send({success: false, msg: err});
-			} else {
-				res.send(article);
-			}
-		});
-	}
+	Article.findOne({'alias': req.query.alias})
+	.select(Article.FIELDS.join(' '))
+	.exec(function(err, article) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send(article);
+		}
+	});
 };
 
 //提交文章
@@ -90,18 +109,37 @@ exports.postArticle = function(req, res) {
 
 exports.updateArticle = function(req, res) {
 	var article = req.body;
-	
-	async.parallel([
-		function(callback) { Article.updateById(article, callback); },
-		function(callback) { Tag.saveNews(article.tags, callback); },
-		function(callback) { Picture.updateByArticleIds(article.imageIds || [], article._id, callback) }
-	], function(err) {
+
+	Article.findOne({_id: article._id})
+	.exec(function(err, oldArticle) {
 		if (err) {
-			res.send({success: false, msg: err});
-		} else {
-			res.send({success: true, msg: message.UPDATE_SUCCESS});
+			return res.send({success: false, msg: err});
 		}
+		
+		async.parallel([
+			function(callback) { oldArticle.updateTo(article, callback); },
+			function(callback) { Tag.saveNews(article.tags, callback); },
+			function(callback) { Picture.updateByArticleIds(article.imageIds || [], article._id, callback) }
+		], function(err) {
+			if (err) {
+				res.send({success: false, msg: err});
+			} else {
+				res.send({success: true, msg: message.UPDATE_SUCCESS});
+			}
+		});
 	});
+	
+	// async.parallel([
+	// 	function(callback) { Article.updateById(article, callback); },
+	// 	function(callback) { Tag.saveNews(article.tags, callback); },
+	// 	function(callback) { Picture.updateByArticleIds(article.imageIds || [], article._id, callback) }
+	// ], function(err) {
+	// 	if (err) {
+	// 		res.send({success: false, msg: err});
+	// 	} else {
+	// 		res.send({success: true, msg: message.UPDATE_SUCCESS});
+	// 	}
+	// });
 };
 
 //删除文章
@@ -122,17 +160,6 @@ exports.removeArticle = function(req, res) {
 			});
 		}
 	});
-
-	// async.parallel([
-	// 	function(callback) { Article.removeById(req.query.id, callback) },
-	// 	function(callback) { Picture.removeByArticleIds() }
-	// ], function(err) {
-	// 	if (err) {
-	// 		res.send({success: false, msg: err});
-	// 	} else {
-	// 		res.send({success: true, msg: message.REMOVE_SUCCESS});
-	// 	}
-	// });
 };
 
 exports.saveImage = function(req, res) {

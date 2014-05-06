@@ -40,6 +40,28 @@ ArticleSchema.post('save', function() {
     Article.status.setNotFresh();
 });
 
+ArticleSchema.methods.updateTo = function(newArticle, callback) {
+    var article = this;
+
+    if (typeof newArticle !== 'object') {
+        return callback(new TypeError());
+    }
+
+    // try {
+        // 遍历更新属性，跳过id
+        for (var key in newArticle) {
+            if (key === '_id') continue;
+            article[key] = newArticle[key];
+        }
+    // } catch (err) {
+    //     return callback(err);
+    // }
+    
+
+    // 保存
+    article.save(callback);
+};
+
 // 设置静态变量
 ArticleSchema.static('FIELDS', Object.keys(ArticleSchema.eachPath(function(){}).paths));
 
@@ -122,36 +144,36 @@ ArticleSchema.static('selectArray', function(query, pageNum, count, fields, call
 // });
 
 // 更新文章
-ArticleSchema.static('updateById', function(newArticle, callback) {
-    if (!newArticle._id) return callback(message.MISSING_ID);
+// ArticleSchema.static('updateById', function(newArticle, callback) {
+//     if (!newArticle._id) return callback(message.MISSING_ID);
     
-    // 根据id查找文章
-    Article.findOne({_id: newArticle._id}, function(err, article) {
-        if (err) return callback(err);
+//     // 根据id查找文章
+//     Article.findOne({_id: newArticle._id}, function(err, article) {
+//         if (err) return callback(err);
 
-        // 遍历更新属性，跳过id
-        for(var key in newArticle) {
-            if (key === '_id') continue;
-            article[key] = newArticle[key];
-        }
+//         // 遍历更新属性，跳过id
+//         for(var key in newArticle) {
+//             if (key === '_id') continue;
+//             article[key] = newArticle[key];
+//         }
 
-        // 保存
-        article.save(callback);
-    });
-});
+//         // 保存
+//         article.save(callback);
+//     });
+// });
 
 // 根据id删除文章
-ArticleSchema.static('removeById', function(id, callback) {
-    if (!id) return callback(message.MISSING_ID);
+// ArticleSchema.static('removeById', function(id, callback) {
+//     if (!id) return callback(message.MISSING_ID);
 
-    Article.remove({_id: id}, callback);
-});
+//     Article.remove({_id: id}, callback);
+// });
 
 // 根据alias查找一篇文章
-ArticleSchema.static('selectByAlias', function(alias, fields, callback) {
-    fields = fields || Article.FIELDS.join(' ');
-    Article.findOne({'alias': alias}).select(fields).exec(callback);
-});
+// ArticleSchema.static('selectByAlias', function(alias, fields, callback) {
+//     fields = fields || Article.FIELDS.join(' ');
+//     Article.findOne({'alias': alias}).select(fields).exec(callback);
+// });
 
 var Article = mongodb.mongoose.model("Article", ArticleSchema);
 var ArticleDAO = function(){};
