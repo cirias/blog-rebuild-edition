@@ -2,7 +2,6 @@ var bcrypt = require('bcrypt');
 var mongodb = require('./mongodb.js');
 var message = require('../config.js').message;
 var config = require('../config.js').config.user;
-var utils = require('../utils.js');
 
 var Schema = mongodb.mongoose.Schema;
 
@@ -56,9 +55,10 @@ UserSchema.methods.incLoginAttempts = function(cb) {
     }
     // 否则加1
     var updates = { $inc: { loginAttempts: 1 } };
+    
     // 如果到达最大尝试次数，设置lockUntil，锁定
-    if (this.loginAttempts + 1 >= config.MAX_LOGIN_ATTEMPTS && !this.isLocked) {
-        updates.$set = { lockUntil: Date.now() + LOCK_TIME };
+    if ((this.loginAttempts + 1) >= config.MAX_LOGIN_ATTEMPTS && !this.isLocked) {
+        updates.$set = { lockUntil: Date.now() + config.LOCK_TIME };
     }
     return this.update(updates, cb);
 };

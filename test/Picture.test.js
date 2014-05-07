@@ -83,10 +83,9 @@ describe('Picture', function() {
                     Picture.updateByArticleIds(ids, 'id2', function(err) {
                         (err === null).should.be.true;
 
-                        db_picture.find({}, function(err, cursor){
+                        db_picture.find({name: 'picture2'}, function(err, cursor){
                             cursor.toArray(function(err,docs) {
                                 docs[0].articleIds.should.be.eql(['id1','id2']);
-                                docs[1].articleIds.should.be.eql(['id1','id2']);
                                 done();
                             })
                         });
