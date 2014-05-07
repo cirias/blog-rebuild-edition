@@ -38,7 +38,6 @@ describe('Textfile', function() {
 		it('should not success.', function(done) {
 			Textfile.update('', function(err) {
 				(err === null).should.be.true;
-				console.log(err);
 
 				String(fs.readFileSync(config.CLIENT_SITE_INFO_PATH)).should.be.eql(String(origin));
 				done();
