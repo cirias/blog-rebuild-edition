@@ -26,6 +26,10 @@ TagSchema.static('selectAll', utils.memoizer(function(callback) {
 
 // 保存新标签
 TagSchema.static('saveNews', function(newTags, callback){
+	if (!Array.isArray(newTags)) {
+		return callback(new TypeError('newTags is not an array.'));
+	}
+
 	this.find({}).exec(function(err, tags) {
 		if (err) return callback(err);
 

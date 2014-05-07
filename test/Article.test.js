@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var helper = require('./helper');
 var Article = require('../models/Article.js');
 var marked = require('marked');
+var async = require('async');
 
 describe('Article', function() {
     before(function(done){ 
@@ -131,77 +132,174 @@ describe('Article', function() {
     });
 
     describe('#getDates()', function() {
-        it('should return date list.', function(done) {
-
-
+        beforeEach(function(done) {
+            Article.status.setNotFresh();
             done();
+        });
+
+        it('each date in date list should represent at least one article\'s createDate.', function(done) {
+            Article.getDates(Article.status, function(err, dates) {
+                async.forEach(dates, function(date, callback) {
+                    var start = new Date(date.year.toString()+'-'+date.month.toString()+'-1');
+                    var year = Math.floor((date.year*12 + date.month)/12);
+                    var month = (date.year*12 + date.month)%12;
+                    var end = new Date(year.toString()+'-'+(month+1).toString()+'-1');
+                    var query = {createDate: {$gte: start, $lt: end}};
+
+                    db_article.find(query, function(err, cursor){ 
+                        cursor.toArray(function(err,docs) {
+                            docs.length.should.be.above(0);
+                            callback(err);
+                        });
+                    });
+                }, function(err) {
+                    done();
+                });
+                // dates.forEach(function(date) {
+                //     var start = new Date(date.year.toString()+'-'+date.month.toString()+'-1');
+                //     var year = Math.floor((date.year*12 + date.month)/12);
+                //     var month = (date.year*12 + date.month)%12;
+                //     var end = new Date(year.toString()+'-'+(month+1).toString()+'-1');
+                //     var query = {createDate: {$gte: start, $lt: end}};
+                //     console.log(start);
+                //     console.log(end);
+                //     console.log(' ');
+
+
+                //     db_article.find(query, function(err, cursor){ 
+                //         cursor.toArray(function(err,docs) {
+                //             docs.length.should.be.above(0);
+                //         });
+                //     });
+                // });
+
+                // db_article.find({}, function(err, cursor){
+                //     cursor.toArray(function(err,docs) {
+                //         docs.map(function(article) {
+                //             return article.createDate;
+                //         }).forEach(function(createDate) {
+                //             var flag = false;
+                //             // var dates = Article.getDates();
+
+                //             for (var i = 0; i < dates.length; i++) {
+                //                 if (createDate.getYear() === dates[i].year && createDate.getMonth() === (dates[i].month-1)) {
+                //                     flag = true;
+                //                     break;
+                //                 }
+                //             }
+
+                //             flag.should.be.true;
+                //         });
+                //     });
+                // });
+            });
+        });
+
+        it('each article\'s createDate should be found in date list.', function(done) {
+            Article.getDates(Article.status, function(err, dates) {
+                db_article.find({}, function(err, cursor) {
+                    cursor.toArray(function(err,docs) {
+                        async.forEach(docs, function(doc, callback) {
+                            var createDate = doc.createDate;
+                            var flag = false;
+
+                            for (var i = 0; i < dates.length; i++) {
+                                if ((createDate.getYear()+1900) === dates[i].year && (createDate.getMonth()+1) === dates[i].month) {
+                                    flag = true;
+                                    break;
+                                }
+                            }
+
+                            flag.should.be.true;
+                            callback(err);
+                        }, function(err) {
+                            done();
+                        });
+                    });
+                });
+            });
         });
     });
 
-    // describe('#selectArray()', function() {
-    //     it('should return all articles', function(done) {
-    //         Article.selectArray(null, null, null, Article.FIELDS.join(' '), function(err, articles) {
-    //             (err === null).should.be.true;
-    //             articles.should.have.lengthOf(20);
-    //             done();
-    //         });
-    //     });
+    
 
-    //     var tag = 'tag1';
-    //     it('should return the articles whose tags contains "'+tag+'".', function(done) {
-    //         var query = {tags: tag};
-    //         Article.selectArray(query, null, null, Article.FIELDS.join(' '), function(err, articles) {
-    //             (err === null).should.be.true;
+    describe('#selectArray()', function() {
+        it('should return all articles', function(done) {
+            Article.selectArray(null, Article.FIELDS.join(' '), function(err, articles) {
+                (err === null).should.be.true;
+                articles.should.have.lengthOf(20);
+                done();
+            });
+        });
 
-    //             db_article.find(query, function(err, cursor){ 
-    //                 cursor.toArray(function(err,docs) {
-    //                     articles.should.have.lengthOf(docs.length);
-    //                 });
-    //             });
+        var tag = 'tag1';
+        it('should return the articles whose tags contains "'+tag+'".', function(done) {
+            var params = {};
+            params.query = {tags: tag};
+            Article.selectArray(params, Article.FIELDS.join(' '), function(err, articles) {
+                (err === null).should.be.true;
 
-    //             articles.forEach(function(article) {
-    //                 article.tags.should.containEql(tag);
-    //             });
+                db_article.find(params.query, function(err, cursor){ 
+                    cursor.toArray(function(err,docs) {
+                        articles.should.have.lengthOf(docs.length);
+                    });
+                });
 
-    //             done();
-    //         });
-    //     });
+                articles.forEach(function(article) {
+                    article.tags.should.containEql(tag);
+                });
 
-    //     var start = new Date('2013-12-1');
-    //     var end = new Date('2014-1-1');
-    //     it('should return the articles whose "createDate" is in '+(start.getYear()+1900)+'-'+(start.getMonth()+1)+'.', function(done) {
-    //         var query = {createDate: {$gte: start, $lt: end}};
-    //         Article.selectArray(query, null, null, Article.FIELDS.join(' '), function(err, articles) {
-    //             (err === null).should.be.true;
+                done();
+            });
+        });
 
-    //             db_article.find(query, function(err, cursor){ 
-    //                 cursor.toArray(function(err,docs) {
-    //                     articles.should.have.lengthOf(docs.length);
-    //                 });
-    //             });
+        var start = new Date('2013-12-1');
+        var end = new Date('2014-1-1');
+        it('should return the articles whose "createDate" is in '+(start.getYear()+1900)+'-'+(start.getMonth()+1)+'.', function(done) {
+            var params = {};
+            params.query = {createDate: {$gte: start, $lt: end}};
+            Article.selectArray(params, Article.FIELDS.join(' '), function(err, articles) {
+                (err === null).should.be.true;
 
-    //             articles.forEach(function(article) {
-    //                 article.createDate.getMonth().should.eql(start.getMonth());
-    //             });
+                db_article.find(params.query, function(err, cursor){ 
+                    cursor.toArray(function(err,docs) {
+                        articles.should.have.lengthOf(docs.length);
+                    });
+                });
 
-    //             done();
-    //         });
-    //     });
-        
-    //     var pageNum = 2;
-    //     var count = 4;
-    //     it('should return the page No.'+pageNum+'\'s '+count+' article.', function(done) {
-    //         Article.selectArray(null, pageNum, count, Article.FIELDS.join(' '), function(err, articles) {
-    //             (err === null).should.be.true;
+                articles.forEach(function(article) {
+                    article.createDate.getMonth().should.eql(start.getMonth());
+                });
 
-    //             db_article.find({}).sort({createDate: '-1'}).skip((pageNum - 1) * count).limit(count);
+                done();
+            });
+        });
 
-    //             // articles.forEach(function(article) {
-    //             //     article.createDate.getMonth().should.eql(start.getMonth());
-    //             // });
+        it('should return an TypeError of params.', function(done) {
+            Article.selectArray("123", Article.FIELDS.join(' '), function(err, articles) {
+                (err !== null).should.be.true;
+                (articles === undefined).should.be.true;
+                err.name.should.be.eql('TypeError');
+                done();
+            });
+        });
 
-    //             done();
-    //         });
-    //     });
-    // });
+        it('should return an TypeError of params.count.', function(done) {
+            Article.selectArray({count:'123'}, Article.FIELDS.join(' '), function(err, articles) {
+                (err !== null).should.be.true;
+                (articles === undefined).should.be.true;
+                err.name.should.be.eql('TypeError');
+                done();
+            });
+        });
+
+        it('should return an TypeError of params.pageNum.', function(done) {
+            Article.selectArray({pageNum:'123'}, Article.FIELDS.join(' '), function(err, articles) {
+                (err !== null).should.be.true;
+                (articles === undefined).should.be.true;
+                err.name.should.be.eql('TypeError');
+                done();
+            });
+        });
+    });
 });

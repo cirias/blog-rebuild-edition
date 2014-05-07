@@ -36,11 +36,22 @@ PictureSchema.methods.pretreat = function() {
 };
 
 PictureSchema.methods.postreat = function(originPath, callback) {
+    if (typeof originPath !== 'string') {
+        return this.remove(function() {
+            callback(new TypeError('originPath is not a path string.'));
+        });
+    }
+
+    if (!fs.existsSync(originPath)) {
+        return this.remove(function() {
+            callback(new Error({name:'PathError',message:'originPath is not exsit.'}));
+        });
+    }
+
     try {
-        fs.renameSync(originPath, this.path);
+        fs.renameSync(originPath, this.path); 
     } catch (err) {
-        this.remove(callback);
-        return;
+        return this.remove(callback);
     }
 
     return callback(null, this);
@@ -59,21 +70,23 @@ PictureSchema.static('insertAndSave', function(file, callback) {
 PictureSchema.static('updateByArticleIds', function(ids, articleId, callback) {
     Picture.find({_id: {$in: ids}}).exec(function(err, pictures) {
         if (err) {
-            callback(err);
-            return;
+            return callback(err);
         }
 
         async.each(pictures.filter(function(picture) {
             return picture.articleIds.indexOf(articleId) < 0;
-        }).map(function(picture) {
-            return picture.articleIds.push(articleId);
         }), function(picture, callback) {
-            picture.save(callback);
+            Picture.findOne({_id: picture._id}).exec(function(err, picture) {
+                picture.articleIds.push(articleId);
+                picture.save(callback);
+            });
         }, function(err) {
-            if (err) return callback(err);
+            if (err) {
+                return callback(err);
+            } else {
+                return callback(null);
+            }
         });
-
-        callback(null);
     });
 });
 
@@ -87,19 +100,23 @@ PictureSchema.static('removeByArticleIds', function(ids, articleId, callback) {
 
         async.each(pictures.filter(function(picture) {
             return picture.articleIds.indexOf(articleId) >= 0;
-        }).map(function(picture) {
-            return picture.articleIds.pop(articleId);
         }), function(picture, callback) {
-            if (picture.articleIds.length === 0) {
-                picture.remove(callback);
-            } else {
-                picture.save(callback);
-            }
-        }, function(err) {
-            if (err) return callback(err);
-        });
+            Picture.findOne({_id: picture._id}).exec(function(err, picture) {
+                picture.articleIds.pop(articleId);
 
-        callback(null);
+                if (picture.articleIds.length === 0) {
+                    picture.remove(callback);
+                } else {
+                    picture.save(callback);
+                }
+            });
+        }, function(err) {
+            if (err) {
+                return callback(err);
+            } else {
+                return callback(null);
+            }
+        });
     });
 });
 

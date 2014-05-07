@@ -47,16 +47,11 @@ ArticleSchema.methods.updateTo = function(newArticle, callback) {
         return callback(new TypeError());
     }
 
-    // try {
-        // 遍历更新属性，跳过id
-        for (var key in newArticle) {
-            if (key === '_id') continue;
-            article[key] = newArticle[key];
-        }
-    // } catch (err) {
-    //     return callback(err);
-    // }
-    
+    // 遍历更新属性，跳过id
+    for (var key in newArticle) {
+        if (key === '_id') continue;
+        article[key] = newArticle[key];
+    }    
 
     // 保存
     article.save(callback);
@@ -114,7 +109,25 @@ ArticleSchema.static('getDates', utils.memoizer(function(callback) {
 }));
 
 // 查询文章数组
-ArticleSchema.static('selectArray', function(query, pageNum, count, fields, callback) {
+ArticleSchema.static('selectArray', function(params, fields, callback) {
+    if (typeof params !== "object") {
+        return callback(new TypeError('params is not an object.'));
+    }
+
+    params = params || {};
+
+    query = params.query;
+    pageNum = params.pageNum;
+    count = params.count;
+
+    if (typeof pageNum !== 'number' && pageNum && typeof pageNum !== 'boolean') {
+        return callback(new TypeError('pageNum is not an number.'));
+    }
+
+    if (typeof count !== 'number' && count && typeof count !== 'boolean') {
+        return callback(new TypeError('count is not an number.'));
+    }
+
     // 转化query为JSON对象
     if (typeof query === "string") {
         query = JSON.parse(query) || {};
@@ -126,54 +139,6 @@ ArticleSchema.static('selectArray', function(query, pageNum, count, fields, call
     // 查询符合query，按createDate倒序，最大数量为count，跳过前(pageNum - 1) * count个
     Article.find(query).select(fields).sort({createDate: '-1'}).skip((pageNum - 1) * count).limit(count).exec(callback);
 });
-
-// 插入文章
-// ArticleSchema.static('insert', function(article, callback) {
-//     new Article(article).save(function(err, article) {
-//         if (err) return callback(err);
-
-//         // 设置文章变动
-//         Article.status.setNotFresh();
-
-//         Picture.updateByArticleIds(article.imageIds, article._id, function(err) {
-//             if (err) return callback(err);
-//         });
-
-//         callback(null);
-//     });
-// });
-
-// 更新文章
-// ArticleSchema.static('updateById', function(newArticle, callback) {
-//     if (!newArticle._id) return callback(message.MISSING_ID);
-    
-//     // 根据id查找文章
-//     Article.findOne({_id: newArticle._id}, function(err, article) {
-//         if (err) return callback(err);
-
-//         // 遍历更新属性，跳过id
-//         for(var key in newArticle) {
-//             if (key === '_id') continue;
-//             article[key] = newArticle[key];
-//         }
-
-//         // 保存
-//         article.save(callback);
-//     });
-// });
-
-// 根据id删除文章
-// ArticleSchema.static('removeById', function(id, callback) {
-//     if (!id) return callback(message.MISSING_ID);
-
-//     Article.remove({_id: id}, callback);
-// });
-
-// 根据alias查找一篇文章
-// ArticleSchema.static('selectByAlias', function(alias, fields, callback) {
-//     fields = fields || Article.FIELDS.join(' ');
-//     Article.findOne({'alias': alias}).select(fields).exec(callback);
-// });
 
 var Article = mongodb.mongoose.model("Article", ArticleSchema);
 var ArticleDAO = function(){};

@@ -13,7 +13,7 @@ var utils = require('../utils.js');
 
 //获取文章信息
 exports.getArticleInfos = function(req, res) {
-	Article.selectArray(null, null, null, Article.INFO_FIELDS.join(' '), function(err, results) {
+	Article.selectArray(null, Article.INFO_FIELDS.join(' '), function(err, results) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {

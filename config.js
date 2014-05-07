@@ -1,4 +1,3 @@
-//i change this comment to check if the 'git pull' works.
 var path = require('path');
 
 exports.config = {

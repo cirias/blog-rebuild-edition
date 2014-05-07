@@ -34,11 +34,11 @@ exports.getArticle = function(req, res) {
 };
 
 exports.getArticles = function(req, res) {
-	var query = JSON.parse(req.query.query) || {};
+	req.query.query = JSON.parse(req.query.query) || {};
 
-	query.hidden = false;
+	req.query.query.hidden = false;
 
-	Article.selectArray(query, req.query.pageNum, req.query.count, Article.CONTENT_FIELDS.join(' '), function(err, results) {
+	Article.selectArray(req.query, Article.CONTENT_FIELDS.join(' '), function(err, results) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {

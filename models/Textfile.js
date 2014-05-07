@@ -12,6 +12,10 @@ TextfileDAO.prototype.update = function(data, callback) {
 	for (var key in data) {
 		newSiteInfo = newSiteInfo.replace('"'+key+'"', '"'+data[key]+'"');
 	}
-	
-	fs.writeFile(config.CLIENT_SITE_INFO_PATH, newSiteInfo, callback);
+
+	if (newSiteInfo !== String(siteInfo)) {
+		fs.writeFile(config.CLIENT_SITE_INFO_PATH, newSiteInfo, callback);
+	} else {
+		callback(null);
+	}
 };
