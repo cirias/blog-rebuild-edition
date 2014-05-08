@@ -7,17 +7,21 @@ var fs = require('fs');
 var config = require('../config.js').config;
 
 describe('Picture', function() {
-    before(function(done){ 
-        helper.connect(function(){done();}); 
+    before(function(done) {
+        helper.connect(function() {
+            helper.initdb(function() {
+                done();
+            });
+        });
     });
-    after(function(done) { 
-        helper.close(function(){done();}); 
+    after(function(done) {
+        helper.close(done);
     });
-    beforeEach(function(done){ 
-        helper.initdbPicture(function(){done();}); 
+    beforeEach(function(done){
+        helper.insertPictures(done); 
     });
-    afterEach(function(done){ 
-        helper.afterPicture(function(){done();}); 
+    afterEach(function(done){
+        helper.removePictures(done);
     });
 
     var db_picture = helper.getConnection().collection('pictures');

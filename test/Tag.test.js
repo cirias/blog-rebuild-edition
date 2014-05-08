@@ -5,14 +5,21 @@ var marked = require('marked');
 var async = require('async');
 
 describe('Tag', function() {
-    before(function(done){ 
-        helper.connect(function(){done();}); 
+    before(function(done) { 
+        helper.connect(function() {
+            helper.initdb(function() {
+                done();
+            });
+        });
     });
     after(function(done) { 
-        helper.close(function(){done();}); 
+        helper.close(done); 
     });
     beforeEach(function(done){ 
-        helper.initdbTag(function(){done();}); 
+        helper.insertTags(done); 
+    });
+    afterEach(function(done) {
+        helper.removeTags(done);
     });
 
     var db_tag = helper.getConnection().collection('tags');

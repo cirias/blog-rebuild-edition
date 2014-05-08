@@ -25,28 +25,13 @@ exports.getArticleInfos = function(req, res) {
 //批量更新
 exports.updateArticles = function(req, res) {
 	var articleIds = Array.isArray(req.query.articleIds) ? req.query.articleIds : [req.query.articleIds];
-	// var articles = Array.isArray(req.query.articles) ? req.query.articles : [req.query.articles];
-	// var articles = req.body.articles;
-	// Article.update({_id: {$in: articles.map(function(article) {return article._id})}, )
+	var data = req.query.data;
 
-	Article.update({_id: {$in: articleIds}}, {$set: article}, { multi: true })
-	.exec(function(err) {
+	Article.update({_id: {$in: articleIds}}, {$set: data}, { multi: true }, function(err) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {
 			res.send({success: true, msg: message.REMOVE_SUCCESS});
-		}
-	});
-
-	async.each(articles, function(article, callback) {
-		Article.update(article, function(err) {
-			callback(err);
-		});
-	}, function(err) {
-		if (err) {
-			res.send({success: false, msg: err});
-		} else {
-			res.send({success: true, msg: message.UPDATE_SUCCESS});
 		}
 	});
 };
@@ -55,26 +40,13 @@ exports.updateArticles = function(req, res) {
 exports.removeArticles = function(req, res) {
 	var articleIds = Array.isArray(req.query.articleIds) ? req.query.articleIds : [req.query.articleIds];
 
-	Article.remove({_id: {$in: articleIds}})
-	.exec(function(err) {
+	Article.remove({_id: {$in: articleIds}}, function(err) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {
 			res.send({success: true, msg: message.REMOVE_SUCCESS});
 		}
 	});
-
-	// async.each(articleIds, function(id, callback) {
-	// 	Article.removeById(id, function(err) {
-	// 		callback(err);
-	// 	});
-	// }, function(err) {
-	// 	if (err) {
-	// 		res.send({success: false, msg: err});
-	// 	} else {
-	// 		res.send({success: true, msg: message.REMOVE_SUCCESS});
-	// 	}
-	// });
 };
 
 //获取文章
@@ -230,13 +202,15 @@ exports.login = function(req, res) {
 		res.send({success: true});
 		return;
 	}
-	console.log(req.body.remember);
 
 	User.getAuthenticated(req.body.username, req.body.password, function(err, user, reasons) {
 		if (err) {
 			res.send({success: false, msg: err});
 			return;
 		}
+
+		// console.log(req.body.username+': '+req.body.password);
+		// console.log(reasons);
 
 		switch (reasons) {
 			case User.failedLogin.NOT_FOUND:

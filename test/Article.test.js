@@ -6,14 +6,21 @@ var marked = require('marked');
 var async = require('async');
 
 describe('Article', function() {
-    before(function(done){ 
-        helper.connect(function(){done();}); 
+    before(function(done) { 
+        helper.connect(function() {
+            helper.initdb(function() {
+                done();
+            });
+        });
     });
     after(function(done) { 
-        helper.close(function(){done();}); 
+        helper.close(done); 
     });
-    beforeEach(function(done){ 
-        helper.initdb(function(){done();}); 
+    beforeEach(function(done) {
+        helper.insertArticles(done);
+    });
+    afterEach(function(done) {
+        helper.removeArticles(done);
     });
 
     var db_article = helper.getConnection().collection('articles');
@@ -55,7 +62,6 @@ describe('Article', function() {
                 }); 
             });
         });
-
     });
 
     describe('#update()', function() {
@@ -220,8 +226,6 @@ describe('Article', function() {
             });
         });
     });
-
-    
 
     describe('#selectArray()', function() {
         it('should return all articles', function(done) {

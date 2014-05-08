@@ -1,52 +1,34 @@
 var User = require('../models/User.js');
-var bcrypt = require('bcrypt');
 var helper = require('./helper');
 var config = require('../config.js').config;
-var async = require('async');
+// var async = require('async');
 var mongoose = require('mongoose');
 
 describe('User', function() {
-	before(function(done){ 
-        helper.connect(function(){done();}); 
+    before(function(done) { 
+        helper.connect(function() {
+            helper.initdb(function() {
+                done();
+            });
+        });
     });
     after(function(done) { 
-        helper.close(function(){done();}); 
+        helper.close(done); 
     });
 
     var db_user = helper.getConnection().collection('users');
-    var user = {};
+    var user;
 
     beforeEach(function(done) {
-    	var conn = mongoose.connection;
-	    // drop database 
-	    conn.db.dropDatabase(function(err){
-	        if(err) { 
-	            return done(err); 
-	        }
-
-	        user = {
-	    		username: 'user_1',
-	    		password: 'password_1',
-	    		loginAttempts: 0
-	    	};
-
-	    	bcrypt.genSalt(config.SALT_WORK_FACTOR, function(err, salt) {
-		        if (err) return done(err);
-
-		        // 用salt生成密码哈希值
-		        bcrypt.hash(user.password, salt, function (err, hash) {
-		            if (err) return done(err);
-
-		            // 用哈希值替代用户密码
-		            user.password = hash;
-
-		            db_user.insert([user], function(err, docs) {
-			            done(err);
-			        });
-		        });
-		    });
-
-	    });
+        user = {
+            username: 'user_1',
+            password: 'password_1',
+            loginAttempts: 0
+        };
+        helper.insertUser(user, done);
+    });
+    afterEach(function(done) { 
+        helper.removeUser(done);
     });
 
     describe('#save()', function() {
@@ -146,16 +128,18 @@ describe('User', function() {
     		User.findOne({username: user.username}, function(err, doc) {
     			if (err) return done(err);
 
-    			doc.lockUntil = Date.now();
+    			doc.lockUntil = Date.now() - 1000;
 
     			doc.save(function(err, doc) {
     				if (err) return done(err);
-
+                    
     				doc.incLoginAttempts(function(err, doc) {
 	    				(err === null).should.be.true;
 
 	    				User.findOne({username: user.username}, function(err, doc) {
 	    					doc.loginAttempts.should.eql(1);
+                            console.log(Date.now());
+                            console.log(doc.lockUntil);
 		    				(doc.lockUntil === undefined).should.be.true;
 		    				done();
 	    				});
