@@ -64,6 +64,25 @@ describe('Picture', function() {
                 type: 'jpeg'
             }, function(err, picture) {
                 (err !== null).should.be.true;
+                err.name.should.be.eql('TypeError');
+
+                db_picture.find({name: 'test_temp'}, function(err, cursor){
+                    cursor.toArray(function(err,docs) {
+                        docs.should.be.empty;
+                        done();
+                    });
+                });
+            });
+        });
+
+        it('should not insert into db and return a ValidationError.', function(done) {
+            Picture.insertAndSave({
+                name: 'test_temp',
+                type: '123',
+                originPath: config.MULTIPARTY_OPTIONS.uploadDir + '/test_temp.jpeg'
+            }, function(err, picture) {
+                (err !== null).should.be.true;
+                err.name.should.be.eql('ValidationError');
 
                 db_picture.find({name: 'test_temp'}, function(err, cursor){
                     cursor.toArray(function(err,docs) {
@@ -120,17 +139,12 @@ describe('Picture', function() {
         it('should remove "id2" in "articleIds" field. And remove picture3.', function(done) {
             db_picture.find({}, function(err, cursor){
                 cursor.toArray(function(err,docs) {
-                    var ids = [];
-                    docs.forEach(function(doc) {
-                        ids.push(doc._id);
-                    });
-
-                    Picture.removeByArticleIds(ids, 'id2', function(err) {
+                    Picture.removeByArticleIds('id2', function(err) {
                         (err === null).should.be.true;
 
                         db_picture.find({}, function(err, cursor){
                             cursor.toArray(function(err,docs) {
-                                docs.should.have.lengthOf(2);
+                                docs.should.have.lengthOf(5);
                                 docs[0].articleIds.should.be.eql(['id1']);
                                 docs[1].articleIds.should.be.eql(['id1']);
                                 done();
@@ -144,12 +158,7 @@ describe('Picture', function() {
         it('should return a TypeError.', function(done) {
             db_picture.find({}, function(err, cursor){
                 cursor.toArray(function(err,docs) {
-                    var ids = [];
-                    docs.forEach(function(doc) {
-                        ids.push(doc._id);
-                    });
-
-                    Picture.removeByArticleIds(ids[0], 'id2', function(err) {
+                    Picture.removeByArticleIds({}, function(err) {
                         (err !== null).should.be.true;
                         err.name.should.be.eql('TypeError');
                         done();

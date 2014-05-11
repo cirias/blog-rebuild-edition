@@ -34,12 +34,17 @@ exports.getArticle = function(req, res) {
 };
 
 exports.getArticles = function(req, res) {
-	req.query.query = JSON.parse(req.query.query) || {};
+	if (typeof req.query.query === 'string') {
+		req.query.query = JSON.parse(req.query.query) || {};
+	} else {
+		req.query.query = req.query.query || {};
+	}
 
 	req.query.query.hidden = false;
 
 	Article.selectArray(req.query, Article.CONTENT_FIELDS.join(' '), function(err, results) {
 		if (err) {
+			console.log(err);
 			res.send({success: false, msg: err});
 		} else {
 			res.send(results);

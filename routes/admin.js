@@ -40,7 +40,14 @@ exports.updateArticles = function(req, res) {
 exports.removeArticles = function(req, res) {
 	var articleIds = Array.isArray(req.query.articleIds) ? req.query.articleIds : [req.query.articleIds];
 
-	Article.remove({_id: {$in: articleIds}}, function(err) {
+	async.parallel([
+		function(cb) { Article.remove({_id: {$in: articleIds}}, cb); },
+		function(cb) {
+			async.each(articleIds, function(articleId, callback) {
+				Picture.removeByArticleIds(articleId, callback);
+			}, cb);
+		}
+	], function(err) {
 		if (err) {
 			res.send({success: false, msg: err});
 		} else {
@@ -69,7 +76,7 @@ exports.postArticle = function(req, res) {
 	async.parallel([
 		function(callback) { article.save(callback); },
 		function(callback) { Tag.saveNews(article.tags, callback); },
-		function(callback) { Picture.updateByArticleIds(article.imageIds, article._id, callback) }
+		function(callback) { Picture.updateByArticleIds(article.imageIds || [], String(article._id), callback); }
 	], function(err) {
 		if (err) {
 			res.send({success: false, msg: err});
@@ -80,10 +87,9 @@ exports.postArticle = function(req, res) {
 };
 
 exports.updateArticle = function(req, res) {
-	var article = req.body;
+	var article = req.query;
 
-	Article.findOne({_id: article._id})
-	.exec(function(err, oldArticle) {
+	Article.findOne({_id: article._id}, function(err, oldArticle) {
 		if (err) {
 			return res.send({success: false, msg: err});
 		}
@@ -91,7 +97,7 @@ exports.updateArticle = function(req, res) {
 		async.parallel([
 			function(callback) { oldArticle.updateTo(article, callback); },
 			function(callback) { Tag.saveNews(article.tags, callback); },
-			function(callback) { Picture.updateByArticleIds(article.imageIds || [], article._id, callback) }
+			function(callback) { Picture.updateByArticleIds(article.imageIds || [], String(article._id), callback); }
 		], function(err) {
 			if (err) {
 				res.send({success: false, msg: err});
@@ -100,18 +106,6 @@ exports.updateArticle = function(req, res) {
 			}
 		});
 	});
-	
-	// async.parallel([
-	// 	function(callback) { Article.updateById(article, callback); },
-	// 	function(callback) { Tag.saveNews(article.tags, callback); },
-	// 	function(callback) { Picture.updateByArticleIds(article.imageIds || [], article._id, callback) }
-	// ], function(err) {
-	// 	if (err) {
-	// 		res.send({success: false, msg: err});
-	// 	} else {
-	// 		res.send({success: true, msg: message.UPDATE_SUCCESS});
-	// 	}
-	// });
 };
 
 //删除文章
@@ -121,8 +115,8 @@ exports.removeArticle = function(req, res) {
 			res.send({success: false, msg: err});
 		} else {
 			async.parallel([
-				function(callback) { article.remove(callback) },
-				function(callback) { Picture.removeByArticleIds(article.imageIds, article._id, callback) }
+				function(callback) { article.remove(callback); },
+				function(callback) { Picture.removeByArticleIds(String(article._id), callback); }
 			], function(err) {
 				if (err) {
 					res.send({success: false, msg: err});
@@ -148,12 +142,6 @@ exports.saveImage = function(req, res) {
 		file.path = files.file[0].path;
 		file.size = files.file[0].size;
 
-		// var verifyMsg = Picture.verify(file);
-		// if (verifyMsg.length != 0) {
-		// 	res.send({success: false, msg: verifyMsg});
-		// 	return;
-		// }
-
 		Picture.insertAndSave({
 	        name: file.name,
 	        originPath: file.path,
@@ -167,22 +155,6 @@ exports.saveImage = function(req, res) {
 
 			utils.deleteContentsInDir(config.MULTIPARTY_OPTIONS.uploadDir);
 		});
-
-		// new Picture({
-	 //        name: file.name,
-	 //        originPath: file.path,
-	 //        type: file.type.split('/')[1].toLowerCase()
-	 //    })
-	 //    .pretreat()
-	 //    .save(file, function(err, data) {
-		// 	if (err) {
-		// 		res.send({success: false, msg: err});
-		// 	} else {
-		// 		res.send({success: true, msg: message.UPLOAD_IMAGE_SUCCESS, image: data});
-		// 	}
-
-		// 	utils.deleteContentsInDir(config.MULTIPARTY_OPTIONS.uploadDir);
-		// });
 	});
 };
 

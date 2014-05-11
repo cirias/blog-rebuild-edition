@@ -123,11 +123,35 @@ exports.insertPictures = function(callback) {
         type: 'jpeg',
         articleIds: ['id2']
     });
+    pictures.push({
+        name: 'picture4',
+        path: relative.IMAGE_DIR + '/test4.jpeg',
+        url : '/test4.jpeg',
+        type: 'jpeg',
+        articleIds: []
+    });
+    pictures.push({
+        name: 'picture5',
+        path: relative.IMAGE_DIR + '/test5.jpeg',
+        url : '/test5.jpeg',
+        type: 'jpeg',
+        articleIds: []
+    });
+    pictures.push({
+        name: 'picture6',
+        path: relative.IMAGE_DIR + '/test6.jpeg',
+        url : '/test6.jpeg',
+        type: 'jpeg',
+        articleIds: []
+    });
 
 
     fs.writeFileSync(relative.IMAGE_DIR + '/test1.jpeg', 'test jpeg file.');
     fs.writeFileSync(relative.IMAGE_DIR + '/test2.jpeg', 'test jpeg file.');
     fs.writeFileSync(relative.IMAGE_DIR + '/test3.jpeg', 'test jpeg file.');
+    fs.writeFileSync(relative.IMAGE_DIR + '/test4.jpeg', 'test jpeg file.');
+    fs.writeFileSync(relative.IMAGE_DIR + '/test5.jpeg', 'test jpeg file.');
+    fs.writeFileSync(relative.IMAGE_DIR + '/test6.jpeg', 'test jpeg file.');
     fs.writeFileSync(config.MULTIPARTY_OPTIONS.uploadDir + '/test_temp.jpeg', 'test temp jpeg file.');
 
     mongoose.connection.collection('pictures').insert(pictures, function(err, docs) {
@@ -135,10 +159,32 @@ exports.insertPictures = function(callback) {
     });
 };
 
+exports.prepareImages = function(callback) {
+    fs.writeFileSync(__dirname + '/test1.jpeg', 'test jpeg file.');
+    fs.writeFileSync(__dirname + '/test2.jpeg', 'test jpeg file.');
+    fs.writeFileSync(__dirname + '/test3.jpeg', 'test jpeg file.');
+    fs.writeFileSync(__dirname + '/test1.notjpeg', 'test notjpeg file.');
+    callback();
+};
+
 exports.removePictures = function(callback) {
-    if (fs.existsSync(config.MULTIPARTY_OPTIONS.uploadDir + '/test_temp.jpeg')) {
-        fs.unlinkSync(config.MULTIPARTY_OPTIONS.uploadDir + '/test_temp.jpeg');
-    }
+    // if (fs.existsSync(config.MULTIPARTY_OPTIONS.uploadDir + '/test_temp.jpeg')) {
+    //     fs.unlinkSync(config.MULTIPARTY_OPTIONS.uploadDir + '/test_temp.jpeg');
+    // }
+
+    var files = fs.readdirSync(__dirname);
+    files.filter(function(file) {
+        return file.split('.')[1] === 'jpeg' || file.split('.')[1] === 'notjpeg';
+    }).forEach(function(file) {
+        fs.unlinkSync(__dirname + '/' + file);
+    });
+
+    var files = fs.readdirSync(config.MULTIPARTY_OPTIONS.uploadDir);
+    files.filter(function(file) {
+        return file.split('.')[1] === 'jpeg';
+    }).forEach(function(file) {
+        fs.unlinkSync(config.MULTIPARTY_OPTIONS.uploadDir + '/' + file);
+    });
 
     var files = fs.readdirSync(relative.IMAGE_DIR);
     files.filter(function(file) {

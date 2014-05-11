@@ -138,8 +138,6 @@ describe('User', function() {
 
 	    				User.findOne({username: user.username}, function(err, doc) {
 	    					doc.loginAttempts.should.eql(1);
-                            console.log(Date.now());
-                            console.log(doc.lockUntil);
 		    				(doc.lockUntil === undefined).should.be.true;
 		    				done();
 	    				});

@@ -68,6 +68,8 @@ PictureSchema.static('insertAndSave', function(file, callback) {
 });
 
 PictureSchema.static('updateByArticleIds', function(ids, articleId, callback) {
+    if (typeof articleId !== 'string') return callback(new TypeError());
+
     Picture.find({_id: {$in: ids}}).exec(function(err, pictures) {
         if (err) {
             return callback(err);
@@ -90,17 +92,16 @@ PictureSchema.static('updateByArticleIds', function(ids, articleId, callback) {
     });
 });
 
-PictureSchema.static('removeByArticleIds', function(ids, articleId, callback) {
+PictureSchema.static('removeByArticleIds', function(articleId, callback) {
+    if (typeof articleId !== 'string') return callback(new TypeError());
 
-    Picture.find({_id: {$in: ids}}).exec(function(err, pictures) {
+    Picture.find({articleIds: articleId}).exec(function(err, pictures) {
         if (err) {
             callback(err);
             return;
         }
 
-        async.each(pictures.filter(function(picture) {
-            return picture.articleIds.indexOf(articleId) >= 0;
-        }), function(picture, callback) {
+        async.each(pictures, function(picture, callback) {
             Picture.findOne({_id: picture._id}).exec(function(err, picture) {
                 picture.articleIds.pop(articleId);
 

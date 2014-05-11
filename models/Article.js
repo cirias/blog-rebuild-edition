@@ -52,7 +52,7 @@ ArticleSchema.methods.updateTo = function(newArticle, callback) {
         if (key === '_id') continue;
         article[key] = newArticle[key];
     }    
-
+    
     // 保存
     article.save(callback);
 };
@@ -115,16 +115,18 @@ ArticleSchema.static('selectArray', function(params, fields, callback) {
     }
 
     params = params || {};
+    pageNum = params.pageNum || 1;
+    count = params.count || Infinity;
 
     query = params.query;
-    pageNum = params.pageNum;
-    count = params.count;
+    pageNum = Number(pageNum);
+    count = Number(count);
 
-    if (typeof pageNum !== 'number' && pageNum && typeof pageNum !== 'boolean') {
+    if (isNaN(pageNum)) {
         return callback(new TypeError('pageNum is not an number.'));
     }
 
-    if (typeof count !== 'number' && count && typeof count !== 'boolean') {
+    if (isNaN(count)) {
         return callback(new TypeError('count is not an number.'));
     }
 
@@ -132,9 +134,6 @@ ArticleSchema.static('selectArray', function(params, fields, callback) {
     if (typeof query === "string") {
         query = JSON.parse(query) || {};
     }
-    
-    pageNum = pageNum || 1;
-    count = count || Infinity;
     
     // 查询符合query，按createDate倒序，最大数量为count，跳过前(pageNum - 1) * count个
     Article.find(query).select(fields).sort({createDate: '-1'}).skip((pageNum - 1) * count).limit(count).exec(callback);

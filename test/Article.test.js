@@ -289,7 +289,7 @@ describe('Article', function() {
         });
 
         it('should return an TypeError of params.count.', function(done) {
-            Article.selectArray({count:'123'}, Article.FIELDS.join(' '), function(err, articles) {
+            Article.selectArray({count:'abc'}, Article.FIELDS.join(' '), function(err, articles) {
                 (err !== null).should.be.true;
                 (articles === undefined).should.be.true;
                 err.name.should.be.eql('TypeError');
@@ -298,7 +298,7 @@ describe('Article', function() {
         });
 
         it('should return an TypeError of params.pageNum.', function(done) {
-            Article.selectArray({pageNum:'123'}, Article.FIELDS.join(' '), function(err, articles) {
+            Article.selectArray({pageNum:'abc'}, Article.FIELDS.join(' '), function(err, articles) {
                 (err !== null).should.be.true;
                 (articles === undefined).should.be.true;
                 err.name.should.be.eql('TypeError');
