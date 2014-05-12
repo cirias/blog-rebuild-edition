@@ -17,7 +17,7 @@ exports.config = {
     },
     textFile : {
     	TEMPLATE_SITE_INFO_PATH : './template/services.js',
-    	CLIENT_SITE_INFO_PATH : 'D:/workspace/project/blog-clientside/app/js/services.js'
+    	CLIENT_SITE_INFO_PATH : './app/js/services.js'
     }
 };//
 
