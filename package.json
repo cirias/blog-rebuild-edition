@@ -24,7 +24,9 @@
   "main": "app.js",
   "devDependencies": {
     "express": "3.4.8",
-    "grunt": "^0.4.4"
+    "grunt": "^0.4.4",
+    "mocha": "*",
+    "should": "*"
   },
   "author": "Sirius",
   "license": "MIC",
