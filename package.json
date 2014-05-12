@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node app.js",
     "register": "node register.js",
-    "test": "mocha"
+    "test": "make test"
   },
   "dependencies": {
     "express": "3.4.8",
