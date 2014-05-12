@@ -240,7 +240,7 @@ describe('route admin', function() {
 				if (err) return done(err);
 
 				res.body.success.should.be.true;
-				res.body.image.url.should.be.startWith('img\\');
+				res.body.image.url.should.be.startWith('img');
 
 				done();
 			});
