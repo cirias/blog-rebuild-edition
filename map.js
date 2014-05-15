@@ -20,6 +20,8 @@ module.exports = function(app) {
 
 	app.get('/dates', common.getDates);
 
+	app.get('/count', common.getArticleCount);
+
 	app.get('/com/article', common.getArticle);
 	app.get('/com/articles', common.getArticles);
 
@@ -28,7 +30,7 @@ module.exports = function(app) {
 	});
 	app.post('/login', admin.login);
 
-	app.all(/^\/dashboard$|^\/articles$|^\/article$|^\/image$|^\/siteinfo$/, admin.authenticate);
+	app.all(/^\/dashboard$|^\/articles$|^\/article$|^\/image$|^\/siteinfo$|^\/js\/myApp\/$/, admin.authenticate);
 
 	app.get('/dashboard', function(request, response, next) {
 		response.sendfile('app/dashboard.html');

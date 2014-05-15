@@ -21,6 +21,16 @@ exports.getDates = function(req, res) {
 	});
 }
 
+exports.getArticleCount = function(req, res) {
+	Article.count({}, function(err, count) {
+		if (err) {
+			res.send({success: false, msg: err});
+		} else {
+			res.send({count: count});
+		}
+	});
+}
+
 exports.getArticle = function(req, res) {
 	Article.findOne({'alias': req.query.alias})
 	.select(Article.CONTENT_FIELDS.join(' '))

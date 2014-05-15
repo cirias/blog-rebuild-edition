@@ -128,13 +128,7 @@ line-height: 0.7;
  */
 
 .main {
-  padding: 20px;
-}
-@media (min-width: 768px) {
-  .main {
-    padding-right: 40px;
-    padding-left: 40px;
-  }
+  padding: 20px 0;
 }
 .main .page-header {
   margin-top: 0;
@@ -160,50 +154,45 @@ line-height: 0.7;
   border-radius: 50%;
 }
 
-.mdEditor {
+.form-article {
+	position: absolute;
+	bottom: 0;
+	top: 50px;
+	left: 40px;
+	right: 40px;
+}
+
+.input-article {
 	position: relative;
-	margin-right: 5px;
-	top: 10px;
-	left: 10px;
-	bottom: 10px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	-webkit-box-flex: 1;
-	-moz-box-flex: 1;
-	-ms-box-flex: 1;
-	-webkit-box-flex: 1;
-	-moz-box-flex: 1;
-	-ms-box-flex: 1;
-	-o-box-flex: 1;
-	box-flex: 1;
+	height: 100%;
+}
+
+.mdEditor {
+	width: 50%;
 }
 
 .mdPreview {
-	position: relative;
-	margin-left: 5px;
-	bottom: 10px;
-	right: 10px;
-	top: 10px;
 	overflow: auto;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	-webkit-box-flex: 1;
-	-moz-box-flex: 1;
-	-ms-box-flex: 1;
-	-webkit-box-flex: 1;
-	-moz-box-flex: 1;
-	-ms-box-flex: 1;
-	-o-box-flex: 1;
-	box-flex: 1;
 }
 
 .mdPreview img {
 	max-width: 100%;
 	height: auto;
+}
+
+.markdown {
+	overflow: hidden;
+	position: absolute;
+	top: 60px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.markdown .mdEditor {
+	height: 100% ;
+}
+
+.markdown .mdPreview {
+	height: 100% ;
 }

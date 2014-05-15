@@ -47,21 +47,15 @@ angular.module('myApp.controllers', [])
     }
 
     $scope.updateArticles = function(changes) {
-      var articles = []
+      var articleIds = []
 
-      // 获取checked文章数组(包括id、内容)
+      // 获取checked文章id数组
       $scope.articlelist.forEach(function(articleInfo) {
-        if (articleInfo.checked) {
-          var article = {_id: articleInfo._id};
-          for(var key in changes) {
-            article[key] = changes[key];
-          }
-          articles.push(article);
-        }
+        if (articleInfo.checked) articleIds.push(articleInfo._id);
       });
 
       // 利用model批量更新，返回消息data
-      Articles.update({articles: articles}, function(data) {
+      Articles.update({articleIds: articleIds, data: changes}, function(data) {
         $scope.setMessage(data);
       });
     }
@@ -156,6 +150,7 @@ angular.module('myApp.controllers', [])
     // 更新文章
     $scope.next = function(article) {
       var article = new Article($scope.article);
+      
       article.$update(function(data) {
         $scope.$emit('eMessageArive', data);
       });

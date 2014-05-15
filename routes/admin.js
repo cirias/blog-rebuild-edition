@@ -87,7 +87,7 @@ exports.postArticle = function(req, res) {
 };
 
 exports.updateArticle = function(req, res) {
-	var article = req.query;
+	var article = req.body;
 
 	Article.findOne({_id: article._id}, function(err, oldArticle) {
 		if (err) {

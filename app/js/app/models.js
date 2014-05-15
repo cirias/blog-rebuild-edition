@@ -21,4 +21,9 @@ angular.module('app.models', [])
 		return $resource(BackendUrl + '/dates', null, {
 			'query':	{ method: 'GET', isArray: true }
 		});
+	}])
+	.factory('Count', ['$resource', 'BackendUrl', function($resource, BackendUrl) {
+		return $resource(BackendUrl + '/count', null, {
+			'get':	{ method: 'GET'}
+		});
 	}]);

@@ -20,7 +20,7 @@ angular.module('app.controllers', [])
 
   }])
   // 多篇文章的画面控制器
-  .controller('ArticlesCtrl', ['$scope', '$sce', '$location', '$routeParams', '$rootScope', 'Paths', 'articleConfig', 'siteInfo', 'Articles', 'Tag', 'Dates', function($scope, $sce, $location, $routeParams, $rootScope, Paths, articleConfig, siteInfo, Articles, Tag, Dates) {
+  .controller('ArticlesCtrl', ['$scope', '$sce', '$location', '$routeParams', '$rootScope', 'Paths', 'articleConfig', 'siteInfo', 'Articles', 'Tag', 'Dates', 'Count', function($scope, $sce, $location, $routeParams, $rootScope, Paths, articleConfig, siteInfo, Articles, Tag, Dates, Count) {
     var params = null;    // 文章查询参数
 
     // 初始化数据
@@ -29,6 +29,10 @@ angular.module('app.controllers', [])
       $rootScope.siteInfo = siteInfo;
       $rootScope.tags = Tag.query();
       $rootScope.dates = Dates.query();
+      $scope.count = 1;
+      Count.get(function(data) {
+        $scope.count = data.count;
+      });
 
       var query = null;   // 查询语句
       var path = $location.path();    // 当前相对url
@@ -65,6 +69,8 @@ angular.module('app.controllers', [])
 
     // 加载文章
     $scope.incArticles = function() {
+      if (params.pageNum >= $scope.count) return;
+      
       params.pageNum = params.pageNum + 1;
       Articles.query(params, function(newArticles) {
         newArticles.forEach(function(article) {
