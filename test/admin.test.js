@@ -443,7 +443,7 @@ describe('route admin', function() {
 			request(app)
 			.put('/article')
 			.set('cookie', cookie)
-			.query(data._doc)
+			.send(data._doc)
 			.expect(200)
 			.end(function(err, res) {
 				if (err) return done(err);
